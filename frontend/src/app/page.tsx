@@ -1,532 +1,299 @@
-"use client";
-import { useEffect, useRef, useState, useCallback } from "react";
-import { useSession, signIn, signOut } from "next-auth/react";
 import Link from "next/link";
-import * as d3 from "d3";
+import { query } from "@/lib/db";
 
-type Professional = {
-  id: string;
-  name: string;
-  profession: string;
-  organization: string;
-  transparency: number | null;
-  accountability: number | null;
-  x: number;
-  y: number;
-  confidence: number | null;
-  color: string;
-  cases: number;
-};
+interface CountRow { count: string; }
 
-const professions = [
-  { name: "裁判官", color: "#6366f1" },
-  { name: "弁護士", color: "#10b981" },
-  { name: "医師", color: "#f59e0b" },
-  { name: "公務員", color: "#ef4444" },
-];
+export const revalidate = 3600; // 1時間キャッシュ
 
-function LoginPrompt() {
-  return (
-    <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-center">
-      <p className="text-sm text-indigo-700 mb-3">
-        ログインすると詳細が表示されます
-      </p>
-      <button
-        onClick={() => signIn("google")}
-        className="inline-flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
-      >
-        <svg className="w-4 h-4" viewBox="0 0 24 24">
-          <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-          <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-          <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-          <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-        </svg>
-        Googleでログイン
-      </button>
-    </div>
-  );
-}
-
-export default function HomePage() {
-  const svgRef = useRef<SVGSVGElement>(null);
-  const { data: session, status } = useSession();
-  const isAuthenticated = !!session?.user;
-  const [selected, setSelected] = useState<Professional | null>(null);
-  const [filter, setFilter] = useState<string | null>(null);
-  const [data, setData] = useState<Professional[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [total, setTotal] = useState(0);
-
-  const fetchProfessionals = useCallback(async (pt?: string | null) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const params = new URLSearchParams({ limit: "200" });
-      if (pt) params.set("profession_type", pt);
-      const res = await fetch(`/api/professionals?${params}`);
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
-      const json = await res.json();
-      setData(json.data ?? []);
-      setTotal(json.total ?? 0);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "取得失敗");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { fetchProfessionals(filter); }, [filter, fetchProfessionals]);
-
-  // 認証状態が変わったらデータ再取得
-  useEffect(() => {
-    if (status !== "loading") fetchProfessionals(filter);
-  }, [status, isAuthenticated]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    if (!svgRef.current || loading || data.length === 0) return;
-    const margin = { top: 40, right: 40, bottom: 60, left: 60 };
-    const width = 640 - margin.left - margin.right;
-    const height = 520 - margin.top - margin.bottom;
-    d3.select(svgRef.current).selectAll("*").remove();
-    const svg = d3
-      .select(svgRef.current)
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-      .attr("transform", `translate(${margin.left},${margin.top})`);
-
-    const xScale = d3.scaleLinear().domain([-1, 1]).range([0, width]);
-    const yScale = d3.scaleLinear().domain([-1, 1]).range([height, 0]);
-
-    [{ x: 0, y: 0, bg: "#f0fdf4" }, { x: -1, y: 0, bg: "#fffbeb" }, { x: 0, y: -1, bg: "#eff6ff" }, { x: -1, y: -1, bg: "#fef2f2" }].forEach(q => {
-      svg.append("rect").attr("x", xScale(q.x)).attr("y", yScale(q.y === 0 ? 1 : 0)).attr("width", width / 2).attr("height", height / 2).attr("fill", q.bg).attr("opacity", 0.6);
-    });
-
-    svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5).tickSize(-height).tickFormat(() => "")).selectAll("line").attr("stroke", "#e5e7eb").attr("stroke-dasharray", "3,3");
-    svg.append("g").call(d3.axisLeft(yScale).ticks(5).tickSize(-width).tickFormat(() => "")).selectAll("line").attr("stroke", "#e5e7eb").attr("stroke-dasharray", "3,3");
-    svg.append("g").attr("transform", `translate(0,${height})`).call(d3.axisBottom(xScale).ticks(5)).selectAll("text").attr("fill", "#6b7280").style("font-size", "11px");
-    svg.append("g").call(d3.axisLeft(yScale).ticks(5)).selectAll("text").attr("fill", "#6b7280").style("font-size", "11px");
-    svg.append("line").attr("x1", xScale(0)).attr("x2", xScale(0)).attr("y1", 0).attr("y2", height).attr("stroke", "#9ca3af").attr("stroke-width", 1.5);
-    svg.append("line").attr("x1", 0).attr("x2", width).attr("y1", yScale(0)).attr("y2", yScale(0)).attr("stroke", "#9ca3af").attr("stroke-width", 1.5);
-    svg.append("text").attr("x", width / 2).attr("y", height + 50).attr("text-anchor", "middle").attr("fill", "#374151").style("font-size", "13px").style("font-weight", "600").text("← 低い　透明性　高い →");
-    svg.append("text").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", -48).attr("text-anchor", "middle").attr("fill", "#374151").style("font-size", "13px").style("font-weight", "600").text("← 低い　説明責任　高い →");
-
-    // domain が [0,0] になるとスケールが縮退して NaN になるため Math.max で保護
-    const maxCases = d3.max(data, d => d.cases) ?? 0;
-    const sizeScale = d3.scaleSqrt().domain([0, Math.max(maxCases, 1)]).range([6, 20]);
-
-    // 全員スコアが同一座標の場合、IDベースの決定論的ジッターで分散表示
-    const allSamePos = data.length > 1 &&
-      data.every(d => d.x === data[0].x && d.y === data[0].y);
-    const jitter = (id: string, axis: 'x' | 'y') => {
-      if (!allSamePos) return 0;
-      const n = parseInt(id) || 0;
-      const h = axis === 'x'
-        ? ((n * 2654435761) % 1000) / 1000
-        : ((n * 2246822519) % 1000) / 1000;
-      return (h * 2 - 1) * 0.8; // [-0.8, 0.8] の範囲に分散
-    };
-
-    // ホバーツールチップ用 <g> をSVG末尾に追加（全円の上に重なるよう最後に追加）
-    const tooltip = svg.append("g")
-      .attr("class", "tooltip")
-      .style("pointer-events", "none")
-      .style("display", "none");
-    tooltip.append("rect")
-      .attr("rx", 4).attr("ry", 4)
-      .attr("fill", "white")
-      .attr("stroke", "#e5e7eb")
-      .attr("stroke-width", 1)
-      .style("filter", "drop-shadow(0 1px 3px rgba(0,0,0,0.12))");
-    tooltip.append("text")
-      .attr("class", "tooltip-text")
-      .attr("fill", "#111827")
-      .style("font-size", "12px")
-      .style("font-weight", "600");
-
-    svg.selectAll("circle")
-      .data(data)
-      .enter()
-      .append("circle")
-      .attr("cx", d => xScale(d.x + jitter(d.id, 'x')))
-      .attr("cy", d => yScale(d.y + jitter(d.id, 'y')))
-      .attr("r", d => sizeScale(d.cases))
-      .attr("fill", d => d.color)
-      .attr("fill-opacity", 0.75)
-      .attr("stroke", d => selected?.id === d.id ? "#1f2937" : "white")
-      .attr("stroke-width", d => selected?.id === d.id ? 3 : 1.5)
-      .attr("cursor", "pointer")
-      .on("click", (_e, d) => {
-        window.location.href = `/professionals/${d.id}`;
-      })
-      .on("mouseover", function (event, d) {
-        d3.select(this).attr("fill-opacity", 1);
-        // ツールチップ表示
-        const label = d.name;
-        const tooltipText = tooltip.select<SVGTextElement>("text.tooltip-text");
-        tooltipText.text(label);
-        const textNode = tooltipText.node();
-        const textWidth = textNode ? textNode.getBBox().width : 80;
-        const pad = 8;
-        const tw = textWidth + pad * 2;
-        const th = 24;
-        tooltip.select("rect").attr("width", tw).attr("height", th);
-        tooltipText.attr("x", pad).attr("y", th - 7);
-        // 円の上部にツールチップを配置、画面端は反転
-        const cx = xScale(d.x + jitter(d.id, 'x'));
-        const cy = yScale(d.y + jitter(d.id, 'y'));
-        const r = sizeScale(d.cases);
-        let tx = cx - tw / 2;
-        let ty = cy - r - th - 4;
-        if (tx < 0) tx = 0;
-        if (tx + tw > width) tx = width - tw;
-        if (ty < 0) ty = cy + r + 4;
-        tooltip.attr("transform", `translate(${tx},${ty})`).style("display", null);
-      })
-      .on("mouseout", function () {
-        d3.select(this).attr("fill-opacity", 0.75);
-        tooltip.style("display", "none");
-      });
-
-    if (data.length <= 30) {
-      svg.selectAll("text.label")
-        .data(data)
-        .enter()
-        .append("text")
-        .attr("class", "label")
-        .attr("x", d => xScale(d.x + jitter(d.id, 'x')) + sizeScale(d.cases) + 4)
-        .attr("y", d => yScale(d.y + jitter(d.id, 'y')) + 4)
-        .text(d => d.name)
-        .attr("fill", "#374151")
-        .style("font-size", "10px")
-        .style("pointer-events", "none");
-    }
-  }, [data, selected, loading]);
+export default async function LandingPage() {
+  const [profRows, decRows] = await Promise.all([
+    query<CountRow>("SELECT COUNT(*) AS count FROM professionals"),
+    query<CountRow>("SELECT COUNT(*) AS count FROM decisions"),
+  ]);
+  const profCount = parseInt(profRows[0]?.count ?? "0").toLocaleString("ja-JP");
+  const decCount = parseInt(decRows[0]?.count ?? "0").toLocaleString("ja-JP");
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
+    <main style={{ fontFamily: "'Noto Sans JP', sans-serif", color: "#0f172a", background: "#fff" }}>
+
+      {/* ナビ */}
+      <nav style={{ borderBottom: "1px solid #e5e5e5", padding: "16px 24px" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#185FA5" }}>ACCOUNTABILITIES.ORG</span>
+          <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
+            <Link href="/map" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>データを見る</Link>
+            <Link href="/professionals" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>一覧</Link>
+            <a
+              href="/trials/new"
+              style={{ fontSize: 13, fontWeight: 600, background: "#0f172a", color: "#fff", padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}
+            >
+              訴訟記録を投稿する
+            </a>
+          </div>
+        </div>
+      </nav>
+
+      {/* 1. Hero */}
+      <section style={{ padding: "96px 24px 80px", borderBottom: "1px solid #e5e5e5" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.14em", color: "#185FA5", marginBottom: 24, textTransform: "uppercase" }}>
+            Accountabilities.org
+          </p>
+          <h1
+            style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "clamp(32px, 5vw, 52px)",
+              fontWeight: 700,
+              lineHeight: 1.4,
+              marginBottom: 28,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            あなたの裁判の記録が、<br />
+            <span style={{ color: "#185FA5" }}>次の人を守る。</span>
+          </h1>
+          <p style={{ fontSize: 17, lineHeight: 1.85, color: "#444", marginBottom: 40, maxWidth: 560 }}>
+            日本の裁判官・弁護士の判断を、公開データとして蓄積する。<br />
+            一つひとつの記録が、法曹の説明責任を問う証拠になる。
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
+            <a
+              href="/trials/new"
+              style={{ background: "#0f172a", color: "#fff", padding: "14px 28px", borderRadius: 10, fontWeight: 700, fontSize: 15, textDecoration: "none", display: "inline-block" }}
+            >
+              訴訟記録を投稿する
+            </a>
+            <Link
+              href="/map"
+              style={{ fontSize: 14, color: "#185FA5", textDecoration: "none", fontWeight: 500 }}
+            >
+              データを見る →
+            </Link>
+          </div>
+        </div>
+        <div style={{ maxWidth: 720, margin: "64px auto 0", textAlign: "right" }}>
+          <p style={{ fontSize: 13, color: "#999", marginBottom: 4 }}>登録済みプロフェッショナル</p>
+          <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 48, fontWeight: 700, color: "#0f172a", lineHeight: 1 }}>
+            {profCount}
+            <span style={{ fontSize: 16, fontWeight: 400, marginLeft: 6, color: "#666" }}>名</span>
+          </p>
+        </div>
+      </section>
+
+      {/* 2. Tension */}
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid #e5e5e5", background: "#fafafa" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64 }} className="lp-tension-grid">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">プロフェッショナル説明責任マップ</h1>
-            <p className="text-sm text-gray-500 mt-1">
-              各職種の透明性・説明責任スコアの分布
-              {!loading && <span className="ml-2 text-indigo-600 font-medium">{total.toLocaleString()} 件</span>}
+            <p
+              style={{
+                fontFamily: "'Noto Serif JP', serif",
+                fontSize: "clamp(18px, 2.5vw, 26px)",
+                lineHeight: 1.9,
+                color: "#1a1a1a",
+                fontWeight: 700,
+              }}
+            >
+              日本では、裁判官の判断に外部から異議を申し立てる手段が極めて限られている。
+            </p>
+            <p
+              style={{
+                fontFamily: "'Noto Serif JP', serif",
+                fontSize: "clamp(18px, 2.5vw, 26px)",
+                lineHeight: 1.9,
+                color: "#185FA5",
+                fontWeight: 700,
+                marginTop: 24,
+              }}
+            >
+              あなたの経験は、データになる。
             </p>
           </div>
-          <div className="flex items-center gap-3">
-            <Link href="/professionals" className="text-sm text-gray-500 hover:text-gray-700">一覧</Link>
-            <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿</a>
-            {status === "loading" ? null : isAuthenticated ? (
-              <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-600">{session.user?.name ?? session.user?.email}</span>
-                <button
-                  onClick={() => signOut()}
-                  className="text-sm text-gray-500 hover:text-gray-700"
-                >
-                  ログアウト
-                </button>
+          <div style={{ display: "flex", flexDirection: "column", gap: 32 }}>
+            {[
+              {
+                num: "99.9%",
+                desc: "日本の刑事裁判有罪率。構造的な問題を示す数字。",
+              },
+              {
+                num: "0件",
+                desc: "裁判官の判断を市民が公開追跡できるデータベース（本サービス以前）。",
+              },
+              {
+                num: `${decCount}件`,
+                desc: "現在収録済みの判決データ数。あなたの記録でさらに精度が上がる。",
+              },
+            ].map((f) => (
+              <div key={f.num} style={{ borderLeft: "3px solid #185FA5", paddingLeft: 20 }}>
+                <p style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 32, fontWeight: 700, color: "#0f172a", lineHeight: 1 }}>{f.num}</p>
+                <p style={{ fontSize: 13, color: "#555", marginTop: 8, lineHeight: 1.7 }}>{f.desc}</p>
               </div>
-            ) : (
-              <button
-                onClick={() => signIn("google")}
-                className="inline-flex items-center gap-2 rounded-lg bg-white border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors"
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                ログイン
-              </button>
-            )}
-            <button
-              onClick={() => fetchProfessionals(filter)}
-              disabled={loading}
-              className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-40"
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3. How it works */}
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid #e5e5e5" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 28, fontWeight: 700, marginBottom: 48, textAlign: "center" }}>
+            どのように機能するか
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 40 }} className="lp-steps-grid">
+            {[
+              {
+                num: "01",
+                title: "記録を投稿する",
+                body: "事件番号・裁判所・担当裁判官・弁護士。あなたの訴訟記録をフォームで入力する。PDF訴状のアップロードにも対応。",
+              },
+              {
+                num: "02",
+                title: "AIが判決を分析する",
+                body: "裁判所の公開判決文をAIが自動収集・分析。透明性スコアと説明責任スコアを算出し、データベースに蓄積する。",
+              },
+              {
+                num: "03",
+                title: "社会の目線になる",
+                body: "蓄積されたデータは誰でも検索・閲覧可能。担当前に調べる。傾向を知る。記録が社会的な抑止力になる。",
+              },
+            ].map((s) => (
+              <div key={s.num}>
+                <p style={{ fontSize: 36, fontWeight: 700, color: "#e5e5e5", fontFamily: "'Noto Serif JP', serif", lineHeight: 1, marginBottom: 16 }}>{s.num}</p>
+                <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>{s.title}</h3>
+                <p style={{ fontSize: 14, color: "#555", lineHeight: 1.85 }}>{s.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Data Preview */}
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid #e5e5e5", background: "#fafafa" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: 28, fontWeight: 700, marginBottom: 8 }}>
+            現在のデータマップ（{profCount}名）
+          </h2>
+          <p style={{ fontSize: 13, color: "#888", marginBottom: 40 }}>透明性 × 説明責任スコア分布</p>
+          <div style={{ position: "relative", borderRadius: 16, overflow: "hidden", border: "1px solid #e5e5e5", background: "#fff" }}>
+            {/* 散布図ダミー */}
+            <svg width="100%" viewBox="0 0 640 400" style={{ display: "block" }}>
+              <rect width="320" height="200" fill="#f0fdf4" opacity="0.6" />
+              <rect x="320" width="320" height="200" fill="#fffbeb" opacity="0.6" />
+              <rect y="200" width="320" height="200" fill="#eff6ff" opacity="0.6" />
+              <rect x="320" y="200" width="320" height="200" fill="#fef2f2" opacity="0.6" />
+              <line x1="320" y1="0" x2="320" y2="400" stroke="#9ca3af" strokeWidth="1.5" />
+              <line x1="0" y1="200" x2="640" y2="200" stroke="#9ca3af" strokeWidth="1.5" />
+              {/* ダミードット */}
+              {[
+                [120,80,8,"#6366f1"],[180,140,10,"#6366f1"],[90,160,7,"#6366f1"],
+                [400,100,9,"#10b981"],[460,160,11,"#10b981"],[380,220,7,"#10b981"],
+                [200,280,8,"#f59e0b"],[260,320,6,"#f59e0b"],
+                [500,300,9,"#ef4444"],[540,250,7,"#ef4444"],
+              ].map(([cx,cy,r,fill],i) => (
+                <circle key={i} cx={cx} cy={cy} r={r} fill={fill as string} fillOpacity={0.75} stroke="white" strokeWidth="1.5" />
+              ))}
+              <text x="320" y="395" textAnchor="middle" fill="#374151" fontSize="12" fontWeight="600">← 低い　透明性　高い →</text>
+            </svg>
+            {/* ブラーオーバーレイ */}
+            <div
+              style={{
+                position: "absolute",
+                inset: 0,
+                backdropFilter: "blur(6px)",
+                background: "rgba(255,255,255,0.5)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 16,
+              }}
             >
-              更新
-            </button>
-          </div>
-          <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿する</a>
-        </div>
-      </header>
-
-      <div className="max-w-6xl mx-auto px-6 py-8">
-        <div className="flex flex-col lg:flex-row gap-8">
-          <div className="flex-1">
-            <div className="flex flex-wrap gap-2 mb-4">
-              <button
-                onClick={() => setFilter(null)}
-                className={`px-4 py-1.5 rounded-full text-sm font-medium transition-colors ${filter === null ? "bg-gray-900 text-white" : "bg-white text-gray-600 border border-gray-300 hover:bg-gray-50"}`}
+              <p style={{ fontSize: 15, color: "#374151", fontWeight: 500 }}>
+                ログインするとスコアと詳細データを確認できます
+              </p>
+              <Link
+                href="/map"
+                style={{ background: "#0f172a", color: "#fff", padding: "10px 24px", borderRadius: 8, fontWeight: 600, fontSize: 14, textDecoration: "none" }}
               >
-                すべて
-              </button>
-              {professions.map(p => (
-                <button
-                  key={p.name}
-                  onClick={() => setFilter(filter === p.name ? null : p.name)}
-                  className="px-4 py-1.5 rounded-full text-sm font-medium transition-colors border"
-                  style={{ backgroundColor: filter === p.name ? p.color : "white", color: filter === p.name ? "white" : p.color, borderColor: p.color }}
-                >
-                  {p.name}
-                </button>
-              ))}
+                データを見る →
+              </Link>
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-x-auto relative min-h-[540px] flex items-center justify-center">
-              {loading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 rounded-xl z-10">
-                  <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-                    <span className="text-sm text-gray-500">データ読み込み中...</span>
-                  </div>
-                </div>
-              )}
-              {error && (
-                <div className="text-center">
-                  <p className="text-red-500 text-sm mb-2">{error}</p>
-                  <button onClick={() => fetchProfessionals(filter)} className="text-sm text-indigo-600 hover:underline">再試行</button>
-                </div>
-              )}
-              {!loading && !error && data.length === 0 && <p className="text-gray-400 text-sm">データがありません</p>}
-              <svg ref={svgRef} className={loading || error ? "opacity-0" : ""} />
-            </div>
-            <div className="mt-3 flex flex-wrap gap-4 text-xs text-gray-500">
-              {professions.map(p => (
-                <div key={p.name} className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: p.color }} />
-                  {p.name}
-                </div>
-              ))}
-              <div className="flex items-center gap-1.5"><span className="text-gray-400">○サイズ</span>= 案件数</div>
-            </div>
-            <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
-              <span className="font-semibold">⚠️ 現在のスコアについて</span>
-              <span className="ml-1">
-                透明性・説明責任スコアは現在集計中です。表示されているスコアおよび散布図上の位置は仮のものであり、実際の評価を反映していません。正式なスコアの公開までしばらくお待ちください。
-              </span>
-            </div>
-          </div>
-
-          <div className="lg:w-72">
-            {selected ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-6">
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: professions.find(p => p.name === selected.profession)?.color ?? "#6b7280" }}>
-                    {selected.profession}
-                  </span>
-                  <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{selected.name}</h2>
-                {selected.organization && <p className="text-xs text-gray-500 mb-4">{selected.organization}</p>}
-
-                {isAuthenticated ? (
-                  <dl className="space-y-3">
-                    {[
-                      { label: "透明性スコア", value: selected.transparency, color: "bg-indigo-500", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
-                      { label: "説明責任スコア", value: selected.accountability, color: "bg-emerald-500", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
-                      { label: "信頼度", value: selected.confidence, color: "bg-purple-500", fmt: (v: number) => `${(v * 100).toFixed(0)}%`, pct: (v: number) => v * 100 },
-                    ].map(({ label, value, color, fmt, pct }) => (
-                      value !== null && (
-                        <div key={label}>
-                          <dt className="text-xs text-gray-500 mb-1">{label}</dt>
-                          <div className="flex items-center gap-2">
-                            <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                              <div className={`h-2 rounded-full ${color}`} style={{ width: `${pct(value)}%` }} />
-                            </div>
-                            <span className="text-sm font-semibold text-gray-700 w-12 text-right">{fmt(value)}</span>
-                          </div>
-                        </div>
-                      )
-                    ))}
-                    <div className="pt-2 border-t border-gray-100">
-                      <dt className="text-xs text-gray-500">関連案件数</dt>
-                      <dd className="text-2xl font-bold text-gray-900 mt-0.5">
-                        {selected.cases.toLocaleString()}
-                        <span className="text-sm font-normal text-gray-500 ml-1">件</span>
-                      </dd>
-                    </div>
-                  </dl>
-                ) : (
-                  <div>
-                    <div className="pt-2 border-t border-gray-100 mb-3">
-                      <dt className="text-xs text-gray-500">関連案件数</dt>
-                      <dd className="text-2xl font-bold text-gray-900 mt-0.5">
-                        {selected.cases.toLocaleString()}
-                        <span className="text-sm font-normal text-gray-500 ml-1">件</span>
-                      </dd>
-                    </div>
-                    <LoginPrompt />
-                  </div>
-                )}
-
-                <ProfessionalDetails professionalId={selected.id} isAuthenticated={isAuthenticated} />
-              </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
-                <h3 className="font-semibold text-gray-700 mb-3">使い方</h3>
-                <ul className="text-sm text-gray-500 space-y-2">
-                  <li>• ドットをクリックして詳細を確認</li>
-                  <li>• 上部ボタンで職種フィルター</li>
-                  <li>• ドットの大きさ = 案件数</li>
-                </ul>
-              </div>
-            )}
-
-            {!loading && data.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mt-4">
-                <h3 className="font-semibold text-gray-700 mb-3">統計サマリー</h3>
-                <div className="space-y-2">
-                  {professions.map(p => {
-                    const items = data.filter(d => d.profession === p.name);
-                    if (!items.length) return null;
-                    const avgX = items.reduce((s, d) => s + d.x, 0) / items.length;
-                    const avgY = items.reduce((s, d) => s + d.y, 0) / items.length;
-                    return (
-                      <div key={p.name} className="text-xs">
-                        <div className="flex items-center justify-between">
-                          <span className="font-medium" style={{ color: p.color }}>{p.name} ({items.length})</span>
-                          {isAuthenticated
-                            ? <span className="text-gray-400">T:{avgX.toFixed(2)} A:{avgY.toFixed(2)}</span>
-                            : <span className="text-gray-400 text-xs">ログイン後表示</span>
-                          }
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* 5. Voice */}
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid #e5e5e5" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "#185FA5", marginBottom: 32, textTransform: "uppercase" }}>
+            投稿者の声
+          </p>
+          <blockquote
+            style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "clamp(18px, 2.5vw, 24px)",
+              lineHeight: 1.9,
+              color: "#1a1a1a",
+              fontWeight: 400,
+              margin: 0,
+              borderLeft: "3px solid #185FA5",
+              paddingLeft: 28,
+            }}
+          >
+            「判決に納得できなかった。でも、どこにも言える場所がなかった。ここに記録を残すことが、自分にできる唯一の抵抗だった。」
+          </blockquote>
+          <p style={{ fontSize: 13, color: "#888", marginTop: 20, paddingLeft: 31 }}>
+            — 民事訴訟経験者・40代・東京
+          </p>
+        </div>
+      </section>
+
+      {/* 6. Final CTA */}
+      <section style={{ padding: "96px 24px", background: "#0f172a" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto", textAlign: "center" }}>
+          <h2
+            style={{
+              fontFamily: "'Noto Serif JP', serif",
+              fontSize: "clamp(24px, 3.5vw, 36px)",
+              fontWeight: 700,
+              color: "#fff",
+              lineHeight: 1.6,
+              marginBottom: 20,
+            }}
+          >
+            あなたの経験を、次の人のための地図にする。
+          </h2>
+          <p style={{ fontSize: 16, color: "#94a3b8", lineHeight: 1.85, marginBottom: 40 }}>
+            登録は無料。記録の公開範囲は自分で選べる。<br />まず一件、投稿してみてください。
+          </p>
+          <a
+            href="/trials/new"
+            style={{
+              display: "inline-block",
+              background: "#fff",
+              color: "#0f172a",
+              padding: "16px 40px",
+              borderRadius: 10,
+              fontWeight: 700,
+              fontSize: 16,
+              textDecoration: "none",
+            }}
+          >
+            訴訟記録を投稿する
+          </a>
+          <p style={{ fontSize: 12, color: "#64748b", marginTop: 20 }}>
+            個人情報は収集しません。Googleアカウントでログイン。
+          </p>
+        </div>
+      </section>
+
+      {/* レスポンシブ対応 */}
+      <style>{`
+        @media (max-width: 768px) {
+          .lp-tension-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
+          .lp-steps-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          nav > div { flex-wrap: wrap; gap: 12px; }
+        }
+      `}</style>
     </main>
   );
 }
-
-function ProfessionalDetails({ professionalId, isAuthenticated }: { professionalId: string; isAuthenticated: boolean }) {
-  const [conduct, setConduct] = useState<{ total: number; details: ConductDetail[] | null } | null>(null);
-  const [decisions, setDecisions] = useState<{ total: number; details: DecisionDetail[] | null } | null>(null);
-
-  useEffect(() => {
-    fetch(`/api/professionals/${professionalId}/conduct`).then(r => r.json()).then(setConduct).catch(() => {});
-    fetch(`/api/professionals/${professionalId}/decisions`).then(r => r.json()).then(setDecisions).catch(() => {});
-  }, [professionalId, isAuthenticated]);
-
-  return (
-    <div className="mt-4 space-y-3">
-      {/* 懲戒歴 */}
-      <section>
-        <h3 className="text-xs font-semibold text-gray-600 mb-1">懲戒歴</h3>
-        {conduct === null ? (
-          <p className="text-xs text-gray-400">読み込み中...</p>
-        ) : conduct.total === 0 ? (
-          <p className="text-xs text-gray-400">記録なし</p>
-        ) : !isAuthenticated ? (
-          <div>
-            <p className="text-xs text-gray-700 font-medium">{conduct.total}件</p>
-            <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-center">
-              <p className="text-xs text-indigo-700 mb-2">ログインすると詳細が表示されます</p>
-              <button
-                onClick={() => signIn("google")}
-                className="inline-flex items-center gap-1 rounded bg-white border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <svg className="w-3 h-3" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Googleでログイン
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {conduct.details?.map(c => (
-              <div key={c.id} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
-                <div className="flex justify-between items-start">
-                  <span className="font-medium text-red-600">{c.log_type ?? "処分"}</span>
-                  <span className="text-gray-400">{c.log_date}</span>
-                </div>
-                {c.conduct_notes && <p className="text-gray-600 mt-1">{c.conduct_notes}</p>}
-                {c.outcome_notes && <p className="text-gray-500 mt-0.5">{c.outcome_notes}</p>}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* 判例 */}
-      <section>
-        <h3 className="text-xs font-semibold text-gray-600 mb-1">判例</h3>
-        {decisions === null ? (
-          <p className="text-xs text-gray-400">読み込み中...</p>
-        ) : decisions.total === 0 ? (
-          <p className="text-xs text-gray-400">記録なし</p>
-        ) : !isAuthenticated ? (
-          <div>
-            <p className="text-xs text-gray-700 font-medium">{decisions.total}件</p>
-            <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-center">
-              <p className="text-xs text-indigo-700 mb-2">ログインすると詳細が表示されます</p>
-              <button
-                onClick={() => signIn("google")}
-                className="inline-flex items-center gap-1 rounded bg-white border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-              >
-                <svg className="w-3 h-3" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                </svg>
-                Googleでログイン
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {decisions.details?.map(d => (
-              <div key={d.id} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
-                <div className="flex justify-between items-start">
-                  <span className="font-medium text-indigo-600">{d.organization ?? d.decision_type ?? "判例"}</span>
-                  <span className="text-gray-400">{d.decision_date ?? ""}</span>
-                </div>
-                {d.title && <p className="text-gray-700 mt-1 font-medium">{d.title}</p>}
-                {d.summary && <p className="text-gray-500 mt-0.5 line-clamp-3">{d.summary}</p>}
-                {d.source_url && (
-                  <a href={d.source_url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline mt-1 block">
-                    判決文を見る →
-                  </a>
-                )}
-              </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
-  );
-}
-
-type ConductDetail = {
-  id: number;
-  log_date: string;
-  organization: string | null;
-  case_number: string | null;
-  log_type: string | null;
-  conduct_notes: string | null;
-  outcome_notes: string | null;
-};
-
-type DecisionDetail = {
-  id: number;
-  decision_id: string;
-  decision_type: string | null;
-  organization: string | null;
-  decision_date: string | null;
-  case_number: string | null;
-  title: string | null;
-  summary: string | null;
-  source_url: string | null;
-};
