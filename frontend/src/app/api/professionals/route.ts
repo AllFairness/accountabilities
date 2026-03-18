@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { query } from '@/lib/db';
-import { auth } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
@@ -29,16 +30,16 @@ function color(t: string) {
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     const isAuthenticated = !!session?.user;
 
     const p = new URL(request.url).searchParams;
-    const minConf = parseFloat(p.get('min_confidence') ?? '0.3');
+    const minConf = parseFloat(p.get('min_confidence') ?? '0.0');
     const limit = Math.min(parseInt(p.get('limit') ?? '100'), 500);
     const offset = parseInt(p.get('offset') ?? '0');
     const pt = p.get('profession_type');
 
-    const conds = ['confidence > $1'];
+    const conds = ['confidence >= $1'];
     const params: unknown[] = [minConf];
     let i = 2;
     if (pt) { conds.push(`profession_type = $${i}`); params.push(pt); i++; }
@@ -59,13 +60,12 @@ export async function GET(request: NextRequest) {
       name: r.name,
       profession: r.profession_type,
       organization: r.organization ?? '',
-      // 認証済みユーザーのみスコア数値を返す
-      // ゲストにはチャート描画用の座標のみ返す（数値ラベルは非表示）
-      transparency: isAuthenticated ? r.stance_axis1 : null,
-      accountability: isAuthenticated ? r.stance_axis2 : null,
       // チャート描画用座標（全ユーザーに返す）
       x: r.stance_axis1,
       y: r.stance_axis2,
+      // 認証済みユーザーのみスコア数値を返す
+      transparency: isAuthenticated ? r.stance_axis1 : null,
+      accountability: isAuthenticated ? r.stance_axis2 : null,
       confidence: isAuthenticated ? r.confidence : null,
       cases: r.record_count,
       color: color(r.profession_type),

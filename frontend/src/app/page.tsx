@@ -188,6 +188,7 @@ export default function HomePage() {
               更新
             </button>
           </div>
+          <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿する</a>
         </div>
       </header>
 

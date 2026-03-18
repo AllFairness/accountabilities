@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { SessionProvider } from 'next-auth/react'
+import SessionProviderWrapper from './components/SessionProviderWrapper'
 
 export const metadata: Metadata = {
   title: 'Accountabilities | 専門職の説明責任を可視化する',
@@ -22,9 +22,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
-        <SessionProvider>{children}</SessionProvider>
-      </body>
+      <body><SessionProviderWrapper>{children}</SessionProviderWrapper></body>
     </html>
   )
 }

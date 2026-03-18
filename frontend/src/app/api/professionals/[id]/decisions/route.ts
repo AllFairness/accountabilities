@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { query } from '@/lib/db';
-import { auth } from '@/lib/auth';
 
 export const runtime = 'nodejs';
 
@@ -25,7 +26,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await auth();
+    const session = await getServerSession(authOptions);
     const isAuthenticated = !!session?.user;
     const professionalId = parseInt(params.id);
 
