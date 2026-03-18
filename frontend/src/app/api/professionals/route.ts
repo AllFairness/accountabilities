@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
     const limit = Math.min(parseInt(p.get('limit') ?? '100'), 500);
     const offset = parseInt(p.get('offset') ?? '0');
     const pt = p.get('profession_type');
-    const conds = ['confidence > $1']; const params: unknown[] = [minConf]; let i = 2;
+    const conds = ['confidence >= $1']; const params: unknown[] = [minConf]; let i = 2;
     if (pt) { conds.push(`profession_type = $${i}`); params.push(pt); i++; }
     const where = conds.join(' AND ');
     params.push(limit, offset);
