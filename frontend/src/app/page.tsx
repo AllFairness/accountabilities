@@ -128,6 +128,23 @@ export default function HomePage() {
       return (h * 2 - 1) * 0.8; // [-0.8, 0.8] の範囲に分散
     };
 
+    // ホバーツールチップ用 <g> をSVG末尾に追加（全円の上に重なるよう最後に追加）
+    const tooltip = svg.append("g")
+      .attr("class", "tooltip")
+      .style("pointer-events", "none")
+      .style("display", "none");
+    tooltip.append("rect")
+      .attr("rx", 4).attr("ry", 4)
+      .attr("fill", "white")
+      .attr("stroke", "#e5e7eb")
+      .attr("stroke-width", 1)
+      .style("filter", "drop-shadow(0 1px 3px rgba(0,0,0,0.12))");
+    tooltip.append("text")
+      .attr("class", "tooltip-text")
+      .attr("fill", "#111827")
+      .style("font-size", "12px")
+      .style("font-weight", "600");
+
     svg.selectAll("circle")
       .data(data)
       .enter()
@@ -141,11 +158,36 @@ export default function HomePage() {
       .attr("stroke-width", d => selected?.id === d.id ? 3 : 1.5)
       .attr("cursor", "pointer")
       .on("click", (_e, d) => {
-        // 詳細ページへ遷移（Ctrl/Cmd+クリックは新タブ）
         window.location.href = `/professionals/${d.id}`;
       })
-      .on("mouseover", function () { d3.select(this).attr("fill-opacity", 1); })
-      .on("mouseout", function () { d3.select(this).attr("fill-opacity", 0.75); });
+      .on("mouseover", function (event, d) {
+        d3.select(this).attr("fill-opacity", 1);
+        // ツールチップ表示
+        const label = d.name;
+        const tooltipText = tooltip.select<SVGTextElement>("text.tooltip-text");
+        tooltipText.text(label);
+        const textNode = tooltipText.node();
+        const textWidth = textNode ? textNode.getBBox().width : 80;
+        const pad = 8;
+        const tw = textWidth + pad * 2;
+        const th = 24;
+        tooltip.select("rect").attr("width", tw).attr("height", th);
+        tooltipText.attr("x", pad).attr("y", th - 7);
+        // 円の上部にツールチップを配置、画面端は反転
+        const cx = xScale(d.x + jitter(d.id, 'x'));
+        const cy = yScale(d.y + jitter(d.id, 'y'));
+        const r = sizeScale(d.cases);
+        let tx = cx - tw / 2;
+        let ty = cy - r - th - 4;
+        if (tx < 0) tx = 0;
+        if (tx + tw > width) tx = width - tw;
+        if (ty < 0) ty = cy + r + 4;
+        tooltip.attr("transform", `translate(${tx},${ty})`).style("display", null);
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("fill-opacity", 0.75);
+        tooltip.style("display", "none");
+      });
 
     if (data.length <= 30) {
       svg.selectAll("text.label")
@@ -259,6 +301,12 @@ export default function HomePage() {
                 </div>
               ))}
               <div className="flex items-center gap-1.5"><span className="text-gray-400">○サイズ</span>= 案件数</div>
+            </div>
+            <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
+              <span className="font-semibold">⚠️ 現在のスコアについて</span>
+              <span className="ml-1">
+                透明性・説明責任スコアは現在集計中です。表示されているスコアおよび散布図上の位置は仮のものであり、実際の評価を反映していません。正式なスコアの公開までしばらくお待ちください。
+              </span>
             </div>
           </div>
 
