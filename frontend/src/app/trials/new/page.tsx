@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 // ---- 型定義 ----
 type Judge = { judge_name: string; role: string; judge_delayed: boolean; judge_clarification: boolean; judge_interrupted: boolean; judge_unprepared: boolean; };
 type Lawyer = { lawyer_name: string; side: string; lawyer_deadline_met: boolean; lawyer_false_claim: boolean; lawyer_obstruction: boolean; };
-type Hearing = { id: number; hearing_date: string; is_collegial: boolean; case_status: string; outcome: string | null; judges: Judge[] | null; lawyers: Lawyer[] | null; };
+type Hearing = { id: number; hearing_date: string; is_collegial: boolean; case_status: string; outcome: string | null; };
 
+// ---- 定数 ----
 const SINGLE_JUDGE = (): Judge => ({ judge_name: "", role: "単独", judge_delayed: false, judge_clarification: false, judge_interrupted: false, judge_unprepared: false });
 const COLLEGIAL_JUDGES = (): Judge[] => [
   { judge_name: "", role: "裁判長", judge_delayed: false, judge_clarification: false, judge_interrupted: false, judge_unprepared: false },
@@ -20,11 +21,142 @@ const JUDGE_CHECKS = [
   { field: "judge_interrupted" as const, label: "当事者の発言を遮った" },
   { field: "judge_unprepared" as const, label: "準備書面を読んでいない様子だった" },
 ];
+// ⑥ ラベル変更
 const LAWYER_CHECKS = [
   { field: "lawyer_deadline_met" as const, label: "期限を守らなかった" },
-  { field: "lawyer_false_claim" as const, label: "虚偽の主張をした" },
+  { field: "lawyer_false_claim" as const, label: "事実と異なる主張があった（記録のみ）" },
   { field: "lawyer_obstruction" as const, label: "訴訟妨害的な行動をした" },
 ];
+
+// ① 裁判所データ
+const COURT_TYPES = ["最高裁判所", "高等裁判所", "地方裁判所", "家庭裁判所", "簡易裁判所"] as const;
+type CourtType = typeof COURT_TYPES[number];
+
+const COURTS_BY_TYPE: Record<CourtType, string[]> = {
+  最高裁判所: ["最高裁判所"],
+  高等裁判所: ["東京高等裁判所", "大阪高等裁判所", "名古屋高等裁判所", "広島高等裁判所", "福岡高等裁判所", "仙台高等裁判所", "札幌高等裁判所", "高松高等裁判所", "その他"],
+  地方裁判所: ["東京地方裁判所", "大阪地方裁判所", "名古屋地方裁判所", "札幌地方裁判所", "仙台地方裁判所", "広島地方裁判所", "福岡地方裁判所", "横浜地方裁判所", "さいたま地方裁判所", "千葉地方裁判所", "京都地方裁判所", "神戸地方裁判所", "その他"],
+  家庭裁判所: ["東京家庭裁判所", "大阪家庭裁判所", "名古屋家庭裁判所", "札幌家庭裁判所", "仙台家庭裁判所", "広島家庭裁判所", "福岡家庭裁判所", "横浜家庭裁判所", "さいたま家庭裁判所", "千葉家庭裁判所", "京都家庭裁判所", "神戸家庭裁判所", "その他"],
+  簡易裁判所: ["東京簡易裁判所", "大阪簡易裁判所", "名古屋簡易裁判所", "その他"],
+};
+
+// ② 事件番号データ
+const CASE_SYMBOLS = ["ワ", "ヲ", "ネ", "レ", "ヌ", "ロ", "ル", "タ", "リ", "チ", "ラ", "モ", "ヨ"];
+const currentYear = new Date().getFullYear();
+const reiwaStart = 2019;
+const reiwaYears = Array.from({ length: currentYear - reiwaStart + 1 }, (_, i) => currentYear - reiwaStart + 1 - i);
+
+// ---- ユーティリティ ----
+const today = new Date().toISOString().split("T")[0];
+
+async function uploadToS3(file: File, trialId: number, fileType: "complaint" | "judgment"): Promise<string> {
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("trial_id", String(trialId));
+  fd.append("file_type", fileType);
+  const res = await fetch("/api/upload", { method: "POST", body: fd });
+  if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? "アップロード失敗");
+  const data = await res.json();
+  return data.url as string;
+}
+
+// ---- ① 裁判所名コンポーネント ----
+function CourtNameSelector({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [courtType, setCourtType] = useState<CourtType>("地方裁判所");
+  const [selectedCourt, setSelectedCourt] = useState("東京地方裁判所");
+  const [customCourt, setCustomCourt] = useState("");
+  const [division, setDivision] = useState("");
+
+  const courts = COURTS_BY_TYPE[courtType];
+  const isOther = selectedCourt === "その他";
+  const isTokyo = selectedCourt === "東京地方裁判所" || selectedCourt === "東京家庭裁判所";
+
+  useEffect(() => {
+    const base = isOther ? customCourt : selectedCourt;
+    const withDiv = isTokyo && division ? `${base} ${division}部` : base;
+    onChange(withDiv);
+  }, [courtType, selectedCourt, customCourt, division, isOther, isTokyo, onChange]);
+
+  const handleTypeChange = (t: CourtType) => {
+    setCourtType(t);
+    const first = COURTS_BY_TYPE[t][0];
+    setSelectedCourt(first);
+    setCustomCourt("");
+    setDivision("");
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">種別</label>
+          <select value={courtType} onChange={e => handleTypeChange(e.target.value as CourtType)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            {COURT_TYPES.map(t => <option key={t}>{t}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">裁判所名</label>
+          <select value={selectedCourt} onChange={e => { setSelectedCourt(e.target.value); setDivision(""); }}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            {courts.map(c => <option key={c}>{c}</option>)}
+          </select>
+        </div>
+      </div>
+      {isOther && (
+        <input type="text" value={customCourt} onChange={e => setCustomCourt(e.target.value)} placeholder="裁判所名を入力" required
+          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+      )}
+      {isTokyo && (
+        <div>
+          <label className="block text-xs text-gray-500 mb-1">部（任意）</label>
+          <div className="flex items-center gap-2">
+            <input type="number" value={division} onChange={e => setDivision(e.target.value)} placeholder="例：21" min="1" max="99"
+              className="w-28 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <span className="text-sm text-gray-500">部</span>
+          </div>
+        </div>
+      )}
+      {value && <p className="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded">→ {value}</p>}
+    </div>
+  );
+}
+
+// ---- ② 事件番号コンポーネント ----
+function CaseNumberInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [era, setEra] = useState<"令和" | "平成">("令和");
+  const [year, setYear] = useState("");
+  const [symbol, setSymbol] = useState("ワ");
+  const [number, setNumber] = useState("");
+
+  useEffect(() => {
+    if (!year && !number) { onChange(""); return; }
+    onChange(`${era}${year}（${symbol}）${number}号`);
+  }, [era, year, symbol, number, onChange]);
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
+        <select value={era} onChange={e => setEra(e.target.value as "令和" | "平成")}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          <option>令和</option><option>平成</option>
+        </select>
+        <input type="number" value={year} onChange={e => setYear(e.target.value)} placeholder="年" min="1" max="30"
+          className="w-16 border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <span className="text-sm text-gray-600">年（</span>
+        <select value={symbol} onChange={e => setSymbol(e.target.value)}
+          className="border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+          {CASE_SYMBOLS.map(s => <option key={s}>{s}</option>)}
+        </select>
+        <span className="text-sm text-gray-600">）</span>
+        <input type="number" value={number} onChange={e => setNumber(e.target.value)} placeholder="番号" min="1"
+          className="w-24 border border-gray-300 rounded-lg px-2 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+        <span className="text-sm text-gray-600">号</span>
+      </div>
+      {value && <p className="text-xs text-indigo-600 bg-indigo-50 px-2 py-1 rounded">→ {value}</p>}
+    </div>
+  );
+}
 
 // ---- Step インジケーター ----
 function StepIndicator({ step }: { step: number }) {
@@ -44,10 +176,10 @@ function StepIndicator({ step }: { step: number }) {
 
 // ---- Step 1: 事件登録 ----
 function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
-  const [courtName, setCourtName] = useState("");
+  const [courtName, setCourtName] = useState("東京地方裁判所");
   const [caseNumber, setCaseNumber] = useState("");
   const [caseType, setCaseType] = useState("通常民事");
-  const [complaintUrl, setComplaintUrl] = useState("");
+  const [complaintFile, setComplaintFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,14 +187,27 @@ function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
     e.preventDefault();
     setSubmitting(true); setError(null);
     try {
+      // 事件マスタ登録（訴状URLはアップロード後に更新するためまず仮登録）
       const res = await fetch("/api/trials", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ court_name: courtName, case_number: caseNumber, case_type: caseType, complaint_url: complaintUrl }),
+        body: JSON.stringify({ court_name: courtName, case_number: caseNumber || null, case_type: caseType }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
       const data = await res.json();
-      onComplete(data.id);
+      const trialId: number = data.id;
+
+      // ③ 訴状PDFをS3にアップロード
+      if (complaintFile) {
+        const url = await uploadToS3(complaintFile, trialId, "complaint");
+        await fetch(`/api/trials/${trialId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ complaint_url: url }),
+        });
+      }
+
+      onComplete(trialId);
     } catch (e) {
       setError(e instanceof Error ? e.message : "登録に失敗しました");
     } finally {
@@ -72,32 +217,39 @@ function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">事件種別 <span className="text-red-500">*</span></label>
-            <select value={caseType} onChange={e => setCaseType(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
-              <option>通常民事</option>
-              <option>人事訴訟</option>
-              <option>その他</option>
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">裁判所名 <span className="text-red-500">*</span></label>
-            <input type="text" value={courtName} onChange={e => setCourtName(e.target.value)} required placeholder="例：東京地方裁判所" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">事件番号（任意）</label>
-            <input type="text" value={caseNumber} onChange={e => setCaseNumber(e.target.value)} placeholder="例：令6（ワ）1234号" className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">訴状PDF URL（任意）</label>
-            <input type="url" value={complaintUrl} onChange={e => setComplaintUrl(e.target.value)} placeholder="https://..." className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-          </div>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">事件種別 <span className="text-red-500">*</span></label>
+          <select value={caseType} onChange={e => setCaseType(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <option>通常民事</option><option>人事訴訟</option><option>その他</option>
+          </select>
+        </div>
+
+        {/* ① 裁判所名プルダウン */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">裁判所名 <span className="text-red-500">*</span></label>
+          <CourtNameSelector value={courtName} onChange={setCourtName} />
+        </div>
+
+        {/* ② 事件番号構造化入力 */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">事件番号（任意）</label>
+          <CaseNumberInput value={caseNumber} onChange={setCaseNumber} />
+        </div>
+
+        {/* ③ 訴状PDFアップロード */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">訴状PDF（任意）</label>
+          <input type="file" accept=".pdf,application/pdf"
+            onChange={e => setComplaintFile(e.target.files?.[0] ?? null)}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+          {complaintFile && <p className="text-xs text-gray-500 mt-1">{complaintFile.name}</p>}
         </div>
       </div>
       {error && <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{error}</div>}
-      <button type="submit" disabled={submitting} className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+      <button type="submit" disabled={submitting}
+        className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
         {submitting ? "登録中..." : "事件を登録して期日を追加する →"}
       </button>
     </form>
@@ -196,15 +348,16 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
         </div>
       )}
 
-      {/* 期日入力フォーム */}
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
           <h3 className="text-base font-semibold text-gray-800">期日を追加</h3>
 
-          {/* 期日日付 */}
+          {/* ④ 期日日付カレンダー（未来日不可） */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">期日日付 <span className="text-red-500">*</span></label>
-            <input type="date" value={hearingDate} onChange={e => setHearingDate(e.target.value)} required className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+            <input type="date" value={hearingDate} onChange={e => setHearingDate(e.target.value)}
+              max={today} required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
 
           {/* 裁判体 */}
@@ -219,7 +372,8 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
                 <div key={i} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
                   <div className="flex items-center gap-2 mb-2">
                     <span className="text-xs font-semibold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">{judge.role}</span>
-                    <input type="text" value={judge.judge_name} onChange={e => updateJudge(i, "judge_name", e.target.value)} placeholder="裁判官名" className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <input type="text" value={judge.judge_name} onChange={e => updateJudge(i, "judge_name", e.target.value)} placeholder="裁判官名"
+                      className="flex-1 border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
                   </div>
                   <div className="grid grid-cols-2 gap-1.5">
                     {JUDGE_CHECKS.map(({ field, label }) => (
@@ -234,23 +388,23 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
             </div>
           </div>
 
-          {/* 相手方弁護士 */}
+          {/* ⑤ 相手方弁護士（追加ボタンを右下に移動） */}
           <div>
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-sm font-semibold text-gray-700">相手方弁護士（任意）</h4>
-              <button type="button" onClick={addLawyer} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium">+ 追加</button>
-            </div>
-            {lawyers.length === 0 && <p className="text-xs text-gray-400">任意項目です</p>}
+            <h4 className="text-sm font-semibold text-gray-700 mb-2">相手方弁護士（任意）</h4>
+            {lawyers.length === 0 && <p className="text-xs text-gray-400 mb-2">任意項目です</p>}
             <div className="space-y-3">
               {lawyers.map((lawyer, i) => (
                 <div key={i} className="border border-gray-100 rounded-lg p-3 bg-gray-50">
                   <div className="flex items-center gap-2 mb-2">
-                    <input type="text" value={lawyer.lawyer_name} onChange={e => updateLawyer(i, "lawyer_name", e.target.value)} placeholder="弁護士名" className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
-                    <select value={lawyer.side} onChange={e => updateLawyer(i, "side", e.target.value)} className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none">
+                    <input type="text" value={lawyer.lawyer_name} onChange={e => updateLawyer(i, "lawyer_name", e.target.value)} placeholder="弁護士名"
+                      className="flex-1 border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                    <select value={lawyer.side} onChange={e => updateLawyer(i, "side", e.target.value)}
+                      className="border border-gray-300 rounded-lg px-2 py-1.5 text-sm focus:outline-none">
                       <option>原告側</option><option>被告側</option>
                     </select>
                     <button type="button" onClick={() => removeLawyer(i)} className="text-gray-400 hover:text-red-500 text-lg px-1">×</button>
                   </div>
+                  {/* ⑥ ラベル変更済みCHECKS使用 */}
                   <div className="grid grid-cols-3 gap-1.5">
                     {LAWYER_CHECKS.map(({ field, label }) => (
                       <label key={field} className="flex items-center gap-1.5 cursor-pointer">
@@ -261,6 +415,12 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
                   </div>
                 </div>
               ))}
+            </div>
+            {/* ⑤ 追加ボタンを右下に配置 */}
+            <div className="flex justify-end mt-2">
+              <button type="button" onClick={addLawyer} className="text-xs text-indigo-600 hover:text-indigo-800 font-medium border border-indigo-200 px-3 py-1.5 rounded-lg hover:bg-indigo-50 transition-colors">
+                ＋ 弁護士を追加
+              </button>
             </div>
           </div>
 
@@ -293,13 +453,15 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">訴訟の現状</label>
-              <select value={caseStatus} onChange={e => setCaseStatus(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <select value={caseStatus} onChange={e => setCaseStatus(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option>継続中</option><option>判決</option><option>和解</option>
               </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">結果</label>
-              <select value={outcome} onChange={e => setOutcome(e.target.value)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <select value={outcome} onChange={e => setOutcome(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 <option value="">---</option>
                 <option>継続中</option><option>勝訴</option><option>敗訴</option><option>一部勝訴</option>
               </select>
@@ -310,7 +472,8 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
         {error && <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{error}</div>}
 
         <div className="flex gap-3">
-          <button type="submit" disabled={submitting} className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+          <button type="submit" disabled={submitting}
+            className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
             {submitting ? "追加中..." : caseStatus === "判決" ? "期日を追加して判決記録へ →" : "この期日を追加する"}
           </button>
           <button type="button" onClick={onFinish} className="px-5 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors">完了</button>
@@ -322,7 +485,7 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
 
 // ---- Step 3: 判決記録 ----
 function Step3({ trialId, onComplete }: { trialId: number; onComplete: () => void }) {
-  const [judgmentUrl, setJudgmentUrl] = useState("");
+  const [judgmentFile, setJudgmentFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -330,10 +493,15 @@ function Step3({ trialId, onComplete }: { trialId: number; onComplete: () => voi
     e.preventDefault();
     setSubmitting(true); setError(null);
     try {
+      let judgmentUrl: string | null = null;
+      // ③ 判決文PDFをS3にアップロード
+      if (judgmentFile) {
+        judgmentUrl = await uploadToS3(judgmentFile, trialId, "judgment");
+      }
       const res = await fetch(`/api/trials/${trialId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ case_status: "判決", judgment_url: judgmentUrl || null }),
+        body: JSON.stringify({ case_status: "判決", judgment_url: judgmentUrl }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error ?? `HTTP ${res.status}`);
       onComplete();
@@ -348,16 +516,21 @@ function Step3({ trialId, onComplete }: { trialId: number; onComplete: () => voi
     <form onSubmit={handleSubmit} className="space-y-6">
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
         <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
-          判決が記録されました。判決文のURLがあれば登録してください（任意）。
+          判決が記録されました。判決文PDFがあればアップロードしてください（任意）。
         </div>
+        {/* ③ 判決文PDFアップロード */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">判決文PDF URL（任意）</label>
-          <input type="url" value={judgmentUrl} onChange={e => setJudgmentUrl(e.target.value)} placeholder="https://..." className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          <label className="block text-sm font-medium text-gray-700 mb-1">判決文PDF（任意）</label>
+          <input type="file" accept=".pdf,application/pdf"
+            onChange={e => setJudgmentFile(e.target.files?.[0] ?? null)}
+            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+          {judgmentFile && <p className="text-xs text-gray-500 mt-1">{judgmentFile.name}</p>}
         </div>
       </div>
       {error && <div className="bg-red-50 border border-red-200 rounded-lg px-4 py-3 text-sm text-red-700">{error}</div>}
       <div className="flex gap-3">
-        <button type="submit" disabled={submitting} className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
+        <button type="submit" disabled={submitting}
+          className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-semibold text-sm hover:bg-indigo-700 disabled:opacity-50 transition-colors">
           {submitting ? "保存中..." : "記録を完了する"}
         </button>
         <button type="button" onClick={onComplete} className="px-5 py-3 rounded-xl border border-gray-300 text-sm font-medium text-gray-700 hover:bg-gray-50">スキップ</button>

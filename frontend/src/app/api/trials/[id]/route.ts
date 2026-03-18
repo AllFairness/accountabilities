@@ -55,12 +55,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   const trialId = parseInt(params.id);
   try {
     const body = await request.json();
-    const { case_status, judgment_url } = body;
+    const { case_status, judgment_url, complaint_url } = body;
 
     const res = await pool.query(
-      `UPDATE trials SET case_status = COALESCE($1, case_status), judgment_url = COALESCE($2, judgment_url), updated_at = now()
-       WHERE id = $3 AND user_email = $4 RETURNING *`,
-      [case_status || null, judgment_url || null, trialId, session.user.email]
+      `UPDATE trials SET case_status = COALESCE($1, case_status), judgment_url = COALESCE($2, judgment_url), complaint_url = COALESCE($3, complaint_url), updated_at = now()
+       WHERE id = $4 AND user_email = $5 RETURNING *`,
+      [case_status || null, judgment_url || null, complaint_url || null, trialId, session.user.email]
     );
     if (res.rows.length === 0) {
       return NextResponse.json({ error: 'Not found' }, { status: 404 });
