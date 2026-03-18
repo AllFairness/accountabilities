@@ -55,7 +55,10 @@ export default function HomePage() {
             <h1 className="text-2xl font-bold text-gray-900">プロフェッショナル説明責任マップ</h1>
             <p className="text-sm text-gray-500 mt-1">各職種の透明性・説明責任スコアの分布{!loading && <span className="ml-2 text-indigo-600 font-medium">{total.toLocaleString()} 件</span>}</p>
           </div>
-          <button onClick={() => fetchProfessionals(filter)} disabled={loading} className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-40">更新</button>
+          <div className="flex items-center gap-3">
+            <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿する</a>
+            <button onClick={() => fetchProfessionals(filter)} disabled={loading} className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-40">更新</button>
+          </div>
         </div>
       </header>
       <div className="max-w-6xl mx-auto px-6 py-8">
