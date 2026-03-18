@@ -54,7 +54,7 @@ export default async function LandingPage() {
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.85, color: "#444", marginBottom: 40, maxWidth: 560 }}>
             日本の裁判官・弁護士の判断を、公開データとして蓄積する。<br />
-            一つひとつの記録が、法曹の説明責任を問う証拠になる。
+            判決後でも、訴訟中でも——すべての期日の記録が、法曹の説明責任を問う証拠になる。
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", gap: 16, alignItems: "center" }}>
             <a
@@ -143,7 +143,7 @@ export default async function LandingPage() {
               {
                 num: "01",
                 title: "記録を投稿する",
-                body: "事件番号・裁判所・担当裁判官・弁護士。あなたの訴訟記録をフォームで入力する。PDF訴状のアップロードにも対応。",
+                body: "事件番号・裁判所・担当裁判官・弁護士。判決後はもちろん、訴訟中の方は期日ごとに記録を追加できます。準備書面・証拠・期日の様子をタイムライン形式で蓄積。",
               },
               {
                 num: "02",
@@ -162,6 +162,76 @@ export default async function LandingPage() {
                 <p style={{ fontSize: 14, color: "#555", lineHeight: 1.85 }}>{s.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 3.5 いま戦っている方へ */}
+      <section style={{ padding: "80px 24px", borderBottom: "1px solid #e5e5e5", background: "#fafafa" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <p style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "#888", marginBottom: 24, textTransform: "uppercase" }}>
+            いま戦っている方へ
+          </p>
+          <h2 style={{ fontFamily: "'Noto Serif JP', serif", fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, marginBottom: 48, lineHeight: 1.6 }}>
+            期日のたびに、記録が積み重なる。
+          </h2>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48 }} className="lp-fighting-grid">
+            {/* 左カラム：3つのポイント */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
+              {[
+                {
+                  title: "期日ごとに記録を追加",
+                  body: "口頭弁論・証人尋問・和解勧試——すべての期日の様子を時系列で投稿できます。",
+                },
+                {
+                  title: "相手方・裁判所の言動を残す",
+                  body: "裁判官の発言・弁護士の対応を記録することで、後から振り返れる客観的なログになります。",
+                },
+                {
+                  title: "結審・判決後も継続できる",
+                  body: "訴訟が終わってからも記録を追記可能。控訴審への引き継ぎにも使えます。",
+                },
+              ].map((item) => (
+                <div key={item.title} style={{ display: "flex", gap: 16 }}>
+                  <div style={{ width: 4, flexShrink: 0, background: "#185FA5", borderRadius: 2, marginTop: 4 }} />
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 700, marginBottom: 6 }}>{item.title}</p>
+                    <p style={{ fontSize: 14, color: "#555", lineHeight: 1.8 }}>{item.body}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* 右カラム：強調ボックス */}
+            <div style={{ border: "1px solid #e5e5e5", borderRadius: 16, background: "#f5f5f5", padding: "36px 32px", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 32 }}>
+              <p
+                style={{
+                  fontFamily: "'Noto Serif JP', serif",
+                  fontSize: "clamp(18px, 2vw, 22px)",
+                  lineHeight: 1.9,
+                  color: "#1a1a1a",
+                  fontWeight: 700,
+                  margin: 0,
+                }}
+              >
+                判決を待たなくていい。<br />今日の期日の記録から、始められる。
+              </p>
+              <a
+                href="/trials/new"
+                style={{
+                  display: "inline-block",
+                  background: "#0f172a",
+                  color: "#fff",
+                  padding: "14px 28px",
+                  borderRadius: 10,
+                  fontWeight: 700,
+                  fontSize: 15,
+                  textDecoration: "none",
+                  alignSelf: "flex-start",
+                }}
+              >
+                今日の期日を記録する
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -291,6 +361,7 @@ export default async function LandingPage() {
         @media (max-width: 768px) {
           .lp-tension-grid { grid-template-columns: 1fr !important; gap: 40px !important; }
           .lp-steps-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
+          .lp-fighting-grid { grid-template-columns: 1fr !important; gap: 32px !important; }
           nav > div { flex-wrap: wrap; gap: 12px; }
         }
       `}</style>
