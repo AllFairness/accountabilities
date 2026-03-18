@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
+import Link from "next/link";
 import * as d3 from "d3";
 
 type Professional = {
@@ -111,21 +112,38 @@ export default function HomePage() {
     svg.append("text").attr("x", width / 2).attr("y", height + 50).attr("text-anchor", "middle").attr("fill", "#374151").style("font-size", "13px").style("font-weight", "600").text("← 低い　透明性　高い →");
     svg.append("text").attr("transform", "rotate(-90)").attr("x", -height / 2).attr("y", -48).attr("text-anchor", "middle").attr("fill", "#374151").style("font-size", "13px").style("font-weight", "600").text("← 低い　説明責任　高い →");
 
-    const sizeScale = d3.scaleSqrt().domain([0, d3.max(data, d => d.cases) ?? 500]).range([6, 20]);
+    // domain が [0,0] になるとスケールが縮退して NaN になるため Math.max で保護
+    const maxCases = d3.max(data, d => d.cases) ?? 0;
+    const sizeScale = d3.scaleSqrt().domain([0, Math.max(maxCases, 1)]).range([6, 20]);
+
+    // 全員スコアが同一座標の場合、IDベースの決定論的ジッターで分散表示
+    const allSamePos = data.length > 1 &&
+      data.every(d => d.x === data[0].x && d.y === data[0].y);
+    const jitter = (id: string, axis: 'x' | 'y') => {
+      if (!allSamePos) return 0;
+      const n = parseInt(id) || 0;
+      const h = axis === 'x'
+        ? ((n * 2654435761) % 1000) / 1000
+        : ((n * 2246822519) % 1000) / 1000;
+      return (h * 2 - 1) * 0.8; // [-0.8, 0.8] の範囲に分散
+    };
 
     svg.selectAll("circle")
       .data(data)
       .enter()
       .append("circle")
-      .attr("cx", d => xScale(d.x))
-      .attr("cy", d => yScale(d.y))
+      .attr("cx", d => xScale(d.x + jitter(d.id, 'x')))
+      .attr("cy", d => yScale(d.y + jitter(d.id, 'y')))
       .attr("r", d => sizeScale(d.cases))
       .attr("fill", d => d.color)
       .attr("fill-opacity", 0.75)
       .attr("stroke", d => selected?.id === d.id ? "#1f2937" : "white")
       .attr("stroke-width", d => selected?.id === d.id ? 3 : 1.5)
       .attr("cursor", "pointer")
-      .on("click", (_e, d) => setSelected(prev => prev?.id === d.id ? null : d))
+      .on("click", (_e, d) => {
+        // 詳細ページへ遷移（Ctrl/Cmd+クリックは新タブ）
+        window.location.href = `/professionals/${d.id}`;
+      })
       .on("mouseover", function () { d3.select(this).attr("fill-opacity", 1); })
       .on("mouseout", function () { d3.select(this).attr("fill-opacity", 0.75); });
 
@@ -135,8 +153,8 @@ export default function HomePage() {
         .enter()
         .append("text")
         .attr("class", "label")
-        .attr("x", d => xScale(d.x) + sizeScale(d.cases) + 4)
-        .attr("y", d => yScale(d.y) + 4)
+        .attr("x", d => xScale(d.x + jitter(d.id, 'x')) + sizeScale(d.cases) + 4)
+        .attr("y", d => yScale(d.y + jitter(d.id, 'y')) + 4)
         .text(d => d.name)
         .attr("fill", "#374151")
         .style("font-size", "10px")
@@ -156,6 +174,8 @@ export default function HomePage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            <Link href="/professionals" className="text-sm text-gray-500 hover:text-gray-700">一覧</Link>
+            <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿</a>
             {status === "loading" ? null : isAuthenticated ? (
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-600">{session.user?.name ?? session.user?.email}</span>
