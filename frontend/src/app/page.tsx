@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef, useState, useCallback } from "react";
+import AuthButton from "./components/AuthButton";
 import * as d3 from "d3";
 type Professional = { id: string; name: string; profession: string; organization: string; transparency: number; accountability: number; confidence: number; color: string; cases: number; };
 const professions = [{ name: "裁判官", color: "#6366f1" }, { name: "弁護士", color: "#10b981" }, { name: "医師", color: "#f59e0b" }, { name: "公務員", color: "#ef4444" }];
@@ -58,6 +59,7 @@ export default function HomePage() {
           <div className="flex items-center gap-3">
             <a href="/trials/new" className="text-sm bg-indigo-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors">訴訟記録を投稿する</a>
             <button onClick={() => fetchProfessionals(filter)} disabled={loading} className="text-sm text-gray-500 hover:text-gray-700 disabled:opacity-40">更新</button>
+            <AuthButton />
           </div>
         </div>
       </header>
