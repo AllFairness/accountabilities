@@ -7,7 +7,7 @@ function color(t: string) { for (const [k,v] of Object.entries(COLORS)) if (t.in
 export async function GET(request: NextRequest) {
   try {
     const p = new URL(request.url).searchParams;
-    const minConf = parseFloat(p.get('min_confidence') ?? '0.3');
+    const minConf = parseFloat(p.get('min_confidence') ?? '0.0');
     const limit = Math.min(parseInt(p.get('limit') ?? '100'), 500);
     const offset = parseInt(p.get('offset') ?? '0');
     const pt = p.get('profession_type');
