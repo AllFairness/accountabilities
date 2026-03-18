@@ -1,89 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
 export const runtime = 'nodejs';
 
-interface JudgeInput {
-  judge_name: string;
-  role: string;
-  judge_delayed: boolean;
-  judge_clarification: boolean;
-  judge_interrupted: boolean;
-  judge_unprepared: boolean;
-}
+export async function GET() {
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
 
-interface LawyerInput {
-  lawyer_name: string;
-  side: string;
-  lawyer_deadline_met: boolean;
-  lawyer_false_claim: boolean;
-  lawyer_obstruction: boolean;
-}
-
-interface PartyInput {
-  side: string;
-  appeared: boolean;
-  represented: boolean;
+  try {
+    const res = await pool.query(
+      `SELECT t.*,
+        (SELECT COUNT(*) FROM trial_logs tl WHERE tl.trial_id = t.id) AS hearing_count
+       FROM trials t
+       WHERE t.user_email = $1
+       ORDER BY t.updated_at DESC`,
+      [session.user.email]
+    );
+    return NextResponse.json({ data: res.rows });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 export async function POST(request: NextRequest) {
-  const client = await pool.connect();
+  const session = await getServerSession(authOptions);
+  if (!session?.user?.email) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
-    const {
-      court_name, case_number, case_type, hearing_date,
-      is_collegial, case_status, outcome,
-      judges, lawyers, parties,
-    } = body;
+    const { court_name, case_number, case_type, complaint_url } = body;
 
-    if (!court_name || !case_type || !hearing_date) {
-      return NextResponse.json({ error: '必須項目が不足しています（裁判所名・事件種別・期日日付）' }, { status: 400 });
+    if (!court_name || !case_type) {
+      return NextResponse.json({ error: '裁判所名と事件種別は必須です' }, { status: 400 });
     }
 
-    await client.query('BEGIN');
-
-    // trial_logs に挿入
-    const trialRes = await client.query(
-      `INSERT INTO trial_logs (court_name, case_number, case_type, hearing_date, is_collegial, case_status, outcome)
-       VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
-      [court_name, case_number || null, case_type, hearing_date, is_collegial ?? false, case_status, outcome]
+    const res = await pool.query(
+      `INSERT INTO trials (user_email, court_name, case_number, case_type, complaint_url)
+       VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+      [session.user.email, court_name, case_number || null, case_type, complaint_url || null]
     );
-    const trialId: number = trialRes.rows[0].id;
-
-    // trial_judges に挿入
-    for (const j of (judges as JudgeInput[] ?? [])) {
-      await client.query(
-        `INSERT INTO trial_judges (trial_log_id, judge_name, role, judge_delayed, judge_clarification, judge_interrupted, judge_unprepared)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-        [trialId, j.judge_name, j.role, j.judge_delayed, j.judge_clarification, j.judge_interrupted, j.judge_unprepared]
-      );
-    }
-
-    // trial_lawyers に挿入
-    for (const l of (lawyers as LawyerInput[] ?? [])) {
-      await client.query(
-        `INSERT INTO trial_lawyers (trial_log_id, lawyer_name, side, lawyer_deadline_met, lawyer_false_claim, lawyer_obstruction)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [trialId, l.lawyer_name, l.side, l.lawyer_deadline_met, l.lawyer_false_claim, l.lawyer_obstruction]
-      );
-    }
-
-    // trial_parties に挿入
-    for (const p of (parties as PartyInput[] ?? [])) {
-      await client.query(
-        `INSERT INTO trial_parties (trial_log_id, side, appeared, represented)
-         VALUES ($1, $2, $3, $4)`,
-        [trialId, p.side, p.appeared, p.represented]
-      );
-    }
-
-    await client.query('COMMIT');
-    return NextResponse.json({ id: trialId }, { status: 201 });
-
+    return NextResponse.json(res.rows[0], { status: 201 });
   } catch (e) {
-    await client.query('ROLLBACK');
     console.error(e);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  } finally {
-    client.release();
   }
 }
