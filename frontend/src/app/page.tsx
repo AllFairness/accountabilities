@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { query } from "@/lib/db";
+import { PageTracker } from "./components/PageTracker";
 
 interface CountRow { count: string; }
 
@@ -15,6 +16,7 @@ export default async function LandingPage() {
 
   return (
     <main style={{ fontFamily: "'Noto Sans JP', sans-serif", color: "#0f172a", background: "#fff" }}>
+      <PageTracker path="/" />
 
       {/* ナビ */}
       <nav style={{ borderBottom: "1px solid #e5e5e5", padding: "16px 24px" }}>

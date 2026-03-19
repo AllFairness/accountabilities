@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -175,10 +175,12 @@ function StepIndicator({ step }: { step: number }) {
 }
 
 // ---- Step 1: 事件登録 ----
-function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
+function Step1({ onComplete, onStart }: { onComplete: (trialId: number) => void; onStart?: () => void }) {
   const [courtName, setCourtName] = useState("東京地方裁判所");
   const [caseNumber, setCaseNumber] = useState("");
   const [caseType, setCaseType] = useState("通常民事");
+  const startFiredRef = useRef(false);
+  const triggerStart = useCallback(() => { if (!startFiredRef.current) { startFiredRef.current = true; onStart?.(); } }, [onStart]);
   const [complaintFile, setComplaintFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -220,7 +222,7 @@ function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-5">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">事件種別 <span className="text-red-500">*</span></label>
-          <select value={caseType} onChange={e => setCaseType(e.target.value)}
+          <select value={caseType} onChange={e => { triggerStart(); setCaseType(e.target.value); }}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
             <option>通常民事</option><option>人事訴訟</option><option>その他</option>
           </select>
@@ -257,7 +259,7 @@ function Step1({ onComplete }: { onComplete: (trialId: number) => void }) {
 }
 
 // ---- Step 2: 期日記録 ----
-function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment: () => void; onFinish: () => void }) {
+function Step2({ trialId, onJudgment, onFinish, onStart }: { trialId: number; onJudgment: () => void; onFinish: () => void; onStart?: () => void }) {
   const [hearings, setHearings] = useState<Hearing[]>([]);
   const [hearingDate, setHearingDate] = useState("");
   const [isCollegial, setIsCollegial] = useState(false);
@@ -355,7 +357,7 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
           {/* ④ 期日日付カレンダー（未来日不可） */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">期日日付 <span className="text-red-500">*</span></label>
-            <input type="date" value={hearingDate} onChange={e => setHearingDate(e.target.value)}
+            <input type="date" value={hearingDate} onChange={e => { onStart?.(); setHearingDate(e.target.value); }}
               max={today} required
               className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
           </div>
@@ -484,7 +486,7 @@ function Step2({ trialId, onJudgment, onFinish }: { trialId: number; onJudgment:
 }
 
 // ---- Step 3: 判決記録 ----
-function Step3({ trialId, onComplete }: { trialId: number; onComplete: () => void }) {
+function Step3({ trialId, onComplete, onStart }: { trialId: number; onComplete: () => void; onStart?: () => void }) {
   const [judgmentFile, setJudgmentFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -522,7 +524,7 @@ function Step3({ trialId, onComplete }: { trialId: number; onComplete: () => voi
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">判決文PDF（任意）</label>
           <input type="file" accept=".pdf,application/pdf"
-            onChange={e => setJudgmentFile(e.target.files?.[0] ?? null)}
+            onChange={e => { onStart?.(); setJudgmentFile(e.target.files?.[0] ?? null); }}
             className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
           {judgmentFile && <p className="text-xs text-gray-500 mt-1">{judgmentFile.name}</p>}
         </div>
@@ -545,6 +547,27 @@ export default function NewTrialPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [trialId, setTrialId] = useState<number | null>(null);
+  const formStartedRef = useRef(false);
+  const completedRef = useRef(false);
+  const stepRef = useRef(1);
+
+  // stepRefをstepと同期
+  useEffect(() => { stepRef.current = step; }, [step]);
+
+  // フォーム離脱検知
+  useEffect(() => {
+    const handler = () => {
+      if (formStartedRef.current && !completedRef.current) {
+        const blob = new Blob([JSON.stringify({ event: "form_abandoned", data: { step: stepRef.current } })], { type: "application/json" });
+        navigator.sendBeacon("/api/notify", blob);
+      }
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
+
+  const markStarted = useCallback(() => { formStartedRef.current = true; }, []);
+  const markCompleted = useCallback(() => { completedRef.current = true; }, []);
 
   useEffect(() => {
     if (status === "unauthenticated") signIn();
@@ -568,9 +591,9 @@ export default function NewTrialPage() {
       </header>
       <div className="max-w-3xl mx-auto px-6 py-8">
         <StepIndicator step={step} />
-        {step === 1 && <Step1 onComplete={id => { setTrialId(id); setStep(2); }} />}
-        {step === 2 && trialId && <Step2 trialId={trialId} onJudgment={() => setStep(3)} onFinish={() => router.push("/trials")} />}
-        {step === 3 && trialId && <Step3 trialId={trialId} onComplete={() => router.push("/trials")} />}
+        {step === 1 && <Step1 onStart={markStarted} onComplete={id => { setTrialId(id); setStep(2); }} />}
+        {step === 2 && trialId && <Step2 trialId={trialId} onStart={markStarted} onJudgment={() => setStep(3)} onFinish={() => { markCompleted(); router.push("/trials"); }} />}
+        {step === 3 && trialId && <Step3 trialId={trialId} onStart={markStarted} onComplete={() => { markCompleted(); router.push("/trials"); }} />}
       </div>
     </main>
   );

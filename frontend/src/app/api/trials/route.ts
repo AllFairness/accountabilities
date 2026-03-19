@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { pool } from '@/lib/db';
+import { sendTelegram, jstNow } from '@/lib/telegram';
 export const runtime = 'nodejs';
 
 export async function GET() {
@@ -45,6 +46,7 @@ export async function POST(request: NextRequest) {
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
       [session.user.email, court_name, case_number || null, case_type, complaint_url || null]
     );
+    await sendTelegram(`✅ 訴訟記録が投稿されました\n事件番号: ${case_number || "未入力"}\n裁判所: ${court_name}\n時刻: ${jstNow()}`);
     return NextResponse.json(res.rows[0], { status: 201 });
   } catch (e) {
     console.error(e);
