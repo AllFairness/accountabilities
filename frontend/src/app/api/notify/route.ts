@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
+import { promises as dns } from "dns";
 import { sendTelegram, jstNow } from "@/lib/telegram";
 
 export const runtime = "nodejs";
+
+async function resolveHost(ip: string): Promise<string> {
+  try {
+    const hostnames = await dns.reverse(ip);
+    return hostnames[0] ?? "逆引き不可";
+  } catch {
+    return "逆引き不可";
+  }
+}
+
+function extractIp(request: NextRequest): string {
+  const xff = request.headers.get("x-forwarded-for");
+  if (xff) return xff.split(",")[0].trim();
+  return request.headers.get("x-real-ip") ?? "不明";
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
@@ -11,9 +27,12 @@ export async function POST(request: NextRequest) {
   let message = "";
 
   switch (event) {
-    case "access":
-      message = `🌐 サイト訪問\nページ: ${data?.path ?? "/"}\nリファラー: ${data?.referrer || "直接"}\n時刻: ${jstNow()}`;
+    case "access": {
+      const ip = extractIp(request);
+      const host = await resolveHost(ip);
+      message = `🌐 サイト訪問\nページ: ${data?.path ?? "/"}\nリファラー: ${data?.referrer || "直接"}\nIP: ${ip}\nホスト: ${host}\n時刻: ${jstNow()}`;
       break;
+    }
     case "signup":
       message = `👤 新規ユーザー登録\n時刻: ${jstNow()}`;
       break;
