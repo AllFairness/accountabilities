@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { promises as dns } from "dns";
 import { sendTelegram, jstNow } from "@/lib/telegram";
+import { pool } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -30,7 +31,10 @@ export async function POST(request: NextRequest) {
     case "access": {
       const ip = extractIp(request);
       const host = await resolveHost(ip);
-      message = `🌐 サイト訪問\nページ: ${data?.path ?? "/"}\nリファラー: ${data?.referrer || "直接"}\nIP: ${ip}\nホスト: ${host}\n時刻: ${jstNow()}`;
+      const path = data?.path ?? "/";
+      const referrer = data?.referrer || "";
+      message = `🌐 サイト訪問\nページ: ${path}\nリファラー: ${referrer || "直接"}\nIP: ${ip}\nホスト: ${host}\n時刻: ${jstNow()}`;
+      pool.query("INSERT INTO page_views (path, referrer) VALUES ($1, $2)", [path, referrer || null]).catch(() => {});
       break;
     }
     case "signup":
