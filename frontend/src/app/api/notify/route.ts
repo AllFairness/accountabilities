@@ -33,7 +33,9 @@ export async function POST(request: NextRequest) {
       const host = await resolveHost(ip);
       const path = data?.path ?? "/";
       const referrer = data?.referrer || "";
-      message = `🌐 サイト訪問\nページ: ${path}\nリファラー: ${referrer || "直接"}\nIP: ${ip}\nホスト: ${host}\n時刻: ${jstNow()}`;
+      const visitCount: number = data?.visitCount ?? 1;
+      const visitLabel = visitCount === 1 ? "🆕 初回訪問" : `🔁 ${visitCount}回目の訪問`;
+      message = `🌐 サイト訪問\nページ: ${path}\nリファラー: ${referrer || "直接"}\nIP: ${ip}\nホスト: ${host}\n${visitLabel}\n時刻: ${jstNow()}`;
       pool.query("INSERT INTO page_views (path, referrer) VALUES ($1, $2)", [path, referrer || null]).catch(() => {});
       break;
     }
