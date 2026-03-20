@@ -24,7 +24,7 @@ export default async function LandingPage() {
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#185FA5" }}>ACCOUNTABILITIES.ORG</span>
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
             <Link href="/map" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>データを見る</Link>
-            <Link href="/professionals" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>一覧</Link>
+            <Link href="/professionals" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>裁判官・弁護士一覧</Link>
             <Link href="/editorial" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>設計書</Link>
             <a
               href="/trials/new"
