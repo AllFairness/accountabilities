@@ -46,12 +46,12 @@ export default function ProfessionalsPage() {
     : data;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <main className="min-h-screen bg-[#fafafa]">
+      <header className="bg-white border-b border-[#e5e5e5] px-6 py-4">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div>
             <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">← マップに戻る</Link>
-            <h1 className="text-xl font-bold text-gray-900 mt-1">プロフェッショナル一覧</h1>
+            <h1 className="text-xl font-bold text-[#0f172a] mt-1">プロフェッショナル一覧</h1>
             <p className="text-xs text-gray-400">{total.toLocaleString()} 件</p>
           </div>
         </div>
@@ -82,12 +82,12 @@ export default function ProfessionalsPage() {
           placeholder="名前・所属で検索..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="w-full mb-4 px-4 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#185FA5]"
         />
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-8 h-8 border-2 border-[#185FA5] border-t-transparent rounded-full animate-spin" />
           </div>
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -95,14 +95,14 @@ export default function ProfessionalsPage() {
               <Link
                 key={p.id}
                 href={`/professionals/${p.id}`}
-                className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-indigo-200 transition-all"
+                className="bg-white rounded-xl border border-[#e5e5e5] p-4 hover:shadow-md hover:border-[#bfdbfe] transition-all"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: p.color }}>
                     {p.name[0]}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="font-semibold text-gray-900 truncate">{p.name}</div>
+                    <div className="font-semibold text-[#0f172a] truncate">{p.name}</div>
                     {p.organization && <div className="text-xs text-gray-500 truncate">{p.organization}</div>}
                   </div>
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white whitespace-nowrap" style={{ backgroundColor: p.color }}>

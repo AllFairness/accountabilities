@@ -27,8 +27,8 @@ const professions = [
 
 function LoginPrompt() {
   return (
-    <div className="mt-4 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-center">
-      <p className="text-sm text-indigo-700 mb-3">
+    <div className="mt-4 rounded-xl border border-[#dbeafe] bg-[#eff6ff] p-4 text-center">
+      <p className="text-sm text-[#1e4d8c] mb-3">
         ログインすると詳細が表示されます
       </p>
       <button
@@ -199,15 +199,15 @@ export default function MapPage() {
   }, [data, selected, loading]);
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b border-gray-200 px-6 py-4">
+    <main className="min-h-screen bg-[#fafafa]">
+      <header className="bg-white border-b border-[#e5e5e5] px-6 py-4">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div>
             <Link href="/" className="text-xs text-gray-400 hover:text-gray-600 mb-1 block">← トップへ</Link>
-            <h1 className="text-2xl font-bold text-gray-900">プロフェッショナル説明責任マップ</h1>
+            <h1 className="text-2xl font-bold text-[#0f172a]">プロフェッショナル説明責任マップ</h1>
             <p className="text-sm text-gray-500 mt-1">
               各職種の透明性・説明責任スコアの分布
-              {!loading && <span className="ml-2 text-indigo-600 font-medium">{total.toLocaleString()} 件</span>}
+              {!loading && <span className="ml-2 text-[#185FA5] font-medium">{total.toLocaleString()} 件</span>}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -270,11 +270,11 @@ export default function MapPage() {
                 </button>
               ))}
             </div>
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 overflow-x-auto relative min-h-[540px] flex items-center justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e5] p-4 overflow-x-auto relative min-h-[540px] flex items-center justify-center">
               {loading && (
                 <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-80 rounded-xl z-10">
                   <div className="flex flex-col items-center gap-3">
-                    <div className="w-8 h-8 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-2 border-[#185FA5] border-t-transparent rounded-full animate-spin" />
                     <span className="text-sm text-gray-500">データ読み込み中...</span>
                   </div>
                 </div>
@@ -282,7 +282,7 @@ export default function MapPage() {
               {error && (
                 <div className="text-center">
                   <p className="text-red-500 text-sm mb-2">{error}</p>
-                  <button onClick={() => fetchProfessionals(filter)} className="text-sm text-indigo-600 hover:underline">再試行</button>
+                  <button onClick={() => fetchProfessionals(filter)} className="text-sm text-[#185FA5] hover:underline">再試行</button>
                 </div>
               )}
               {!loading && !error && data.length === 0 && <p className="text-gray-400 text-sm">データがありません</p>}
@@ -307,20 +307,20 @@ export default function MapPage() {
 
           <div className="lg:w-72">
             {selected ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 sticky top-6">
+              <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e5] p-5 sticky top-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white" style={{ backgroundColor: professions.find(p => p.name === selected.profession)?.color ?? "#6b7280" }}>
                     {selected.profession}
                   </span>
                   <button onClick={() => setSelected(null)} className="text-gray-400 hover:text-gray-600 text-lg leading-none">×</button>
                 </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-1">{selected.name}</h2>
+                <h2 className="text-xl font-bold text-[#0f172a] mb-1">{selected.name}</h2>
                 {selected.organization && <p className="text-xs text-gray-500 mb-4">{selected.organization}</p>}
 
                 {isAuthenticated ? (
                   <dl className="space-y-3">
                     {[
-                      { label: "透明性スコア", value: selected.transparency, color: "bg-indigo-500", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
+                      { label: "透明性スコア", value: selected.transparency, color: "bg-[#185FA5]", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
                       { label: "説明責任スコア", value: selected.accountability, color: "bg-emerald-500", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
                       { label: "信頼度", value: selected.confidence, color: "bg-purple-500", fmt: (v: number) => `${(v * 100).toFixed(0)}%`, pct: (v: number) => v * 100 },
                     ].map(({ label, value, color, fmt, pct }) => (
@@ -338,7 +338,7 @@ export default function MapPage() {
                     ))}
                     <div className="pt-2 border-t border-gray-100">
                       <dt className="text-xs text-gray-500">関連案件数</dt>
-                      <dd className="text-2xl font-bold text-gray-900 mt-0.5">
+                      <dd className="text-2xl font-bold text-[#0f172a] mt-0.5">
                         {selected.cases.toLocaleString()}
                         <span className="text-sm font-normal text-gray-500 ml-1">件</span>
                       </dd>
@@ -348,7 +348,7 @@ export default function MapPage() {
                   <div>
                     <div className="pt-2 border-t border-gray-100 mb-3">
                       <dt className="text-xs text-gray-500">関連案件数</dt>
-                      <dd className="text-2xl font-bold text-gray-900 mt-0.5">
+                      <dd className="text-2xl font-bold text-[#0f172a] mt-0.5">
                         {selected.cases.toLocaleString()}
                         <span className="text-sm font-normal text-gray-500 ml-1">件</span>
                       </dd>
@@ -360,7 +360,7 @@ export default function MapPage() {
                 <ProfessionalDetails professionalId={selected.id} isAuthenticated={isAuthenticated} />
               </div>
             ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5">
+              <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e5] p-5">
                 <h3 className="font-semibold text-gray-700 mb-3">使い方</h3>
                 <ul className="text-sm text-gray-500 space-y-2">
                   <li>• ドットをクリックして詳細を確認</li>
@@ -371,7 +371,7 @@ export default function MapPage() {
             )}
 
             {!loading && data.length > 0 && (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mt-4">
+              <div className="bg-white rounded-xl shadow-sm border border-[#e5e5e5] p-5 mt-4">
                 <h3 className="font-semibold text-gray-700 mb-3">統計サマリー</h3>
                 <div className="space-y-2">
                   {professions.map(p => {
@@ -421,8 +421,8 @@ function ProfessionalDetails({ professionalId, isAuthenticated }: { professional
         ) : !isAuthenticated ? (
           <div>
             <p className="text-xs text-gray-700 font-medium">{conduct.total}件</p>
-            <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-center">
-              <p className="text-xs text-indigo-700 mb-2">ログインすると詳細が表示されます</p>
+            <div className="mt-2 rounded-lg border border-[#dbeafe] bg-[#eff6ff] p-3 text-center">
+              <p className="text-xs text-[#1e4d8c] mb-2">ログインすると詳細が表示されます</p>
               <button
                 onClick={() => signIn("google")}
                 className="inline-flex items-center gap-1 rounded bg-white border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
@@ -440,7 +440,7 @@ function ProfessionalDetails({ professionalId, isAuthenticated }: { professional
         ) : (
           <div className="space-y-2">
             {conduct.details?.map(c => (
-              <div key={c.id} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
+              <div key={c.id} className="text-xs border border-gray-100 rounded p-2 bg-[#f5f5f5]">
                 <div className="flex justify-between items-start">
                   <span className="font-medium text-red-600">{c.log_type ?? "処分"}</span>
                   <span className="text-gray-400">{c.log_date}</span>
@@ -462,8 +462,8 @@ function ProfessionalDetails({ professionalId, isAuthenticated }: { professional
         ) : !isAuthenticated ? (
           <div>
             <p className="text-xs text-gray-700 font-medium">{decisions.total}件</p>
-            <div className="mt-2 rounded-lg border border-indigo-100 bg-indigo-50 p-3 text-center">
-              <p className="text-xs text-indigo-700 mb-2">ログインすると詳細が表示されます</p>
+            <div className="mt-2 rounded-lg border border-[#dbeafe] bg-[#eff6ff] p-3 text-center">
+              <p className="text-xs text-[#1e4d8c] mb-2">ログインすると詳細が表示されます</p>
               <button
                 onClick={() => signIn("google")}
                 className="inline-flex items-center gap-1 rounded bg-white border border-gray-300 px-2 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
@@ -481,15 +481,15 @@ function ProfessionalDetails({ professionalId, isAuthenticated }: { professional
         ) : (
           <div className="space-y-2">
             {decisions.details?.map(d => (
-              <div key={d.id} className="text-xs border border-gray-100 rounded p-2 bg-gray-50">
+              <div key={d.id} className="text-xs border border-gray-100 rounded p-2 bg-[#f5f5f5]">
                 <div className="flex justify-between items-start">
-                  <span className="font-medium text-indigo-600">{d.organization ?? d.decision_type ?? "判例"}</span>
+                  <span className="font-medium text-[#185FA5]">{d.organization ?? d.decision_type ?? "判例"}</span>
                   <span className="text-gray-400">{d.decision_date ?? ""}</span>
                 </div>
                 {d.title && <p className="text-gray-700 mt-1 font-medium">{d.title}</p>}
                 {d.summary && <p className="text-gray-500 mt-0.5 line-clamp-3">{d.summary}</p>}
                 {d.source_url && (
-                  <a href={d.source_url} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:underline mt-1 block">
+                  <a href={d.source_url} target="_blank" rel="noopener noreferrer" className="text-[#185FA5] hover:underline mt-1 block">
                     判決文を見る →
                   </a>
                 )}
