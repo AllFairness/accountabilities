@@ -152,6 +152,7 @@ export default async function LandingPage() {
                 num: "02",
                 title: "AIが判決を分析する",
                 body: "裁判所の公開判決文をAIが自動収集・分析。透明性スコアと説明責任スコアを算出し、データベースに蓄積する。",
+                link: { text: "スコアリング設計書を読む →", href: "/editorial/overview.html" },
               },
               {
                 num: "03",
@@ -163,6 +164,11 @@ export default async function LandingPage() {
                 <p style={{ fontSize: 36, fontWeight: 700, color: "#e5e5e5", fontFamily: "'Noto Serif JP', serif", lineHeight: 1, marginBottom: 16 }}>{s.num}</p>
                 <h3 style={{ fontSize: 16, fontWeight: 700, marginBottom: 10 }}>{s.title}</h3>
                 <p style={{ fontSize: 14, color: "#555", lineHeight: 1.85 }}>{s.body}</p>
+                {"link" in s && s.link && (
+                  <a href={s.link.href} style={{ fontSize: 13, color: "#185FA5", textDecoration: "none", fontWeight: 500, display: "inline-block", marginTop: 10 }}>
+                    {s.link.text}
+                  </a>
+                )}
               </div>
             ))}
           </div>
