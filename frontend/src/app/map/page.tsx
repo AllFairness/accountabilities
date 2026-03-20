@@ -211,8 +211,8 @@ export default function MapPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Link href="/professionals" className="text-sm text-gray-500 hover:text-gray-700">一覧</Link>
-            <Link href="/editorial" className="text-sm text-gray-500 hover:text-gray-700">設計書</Link>
+            <Link href="/professionals" className="text-sm font-semibold text-red-700 border border-red-700 rounded-md px-3 py-1 hover:bg-red-50 transition-colors">裁判官・弁護士一覧</Link>
+            <Link href="/editorial" className="text-sm font-semibold text-red-700 border border-red-700 rounded-md px-3 py-1 hover:bg-red-50 transition-colors">設計書</Link>
             <a href="/trials/new" className="text-sm bg-gray-900 text-white px-3 py-1.5 rounded-lg font-medium hover:bg-gray-700 transition-colors">訴訟記録を投稿する</a>
             {status === "loading" ? null : isAuthenticated ? (
               <div className="flex items-center gap-3">

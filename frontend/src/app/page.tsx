@@ -23,9 +23,9 @@ export default async function LandingPage() {
         <div style={{ maxWidth: 960, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <span style={{ fontSize: 13, fontWeight: 700, letterSpacing: "0.12em", color: "#185FA5" }}>ACCOUNTABILITIES.ORG</span>
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
-            <Link href="/map" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>データを見る</Link>
-            <Link href="/professionals" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>裁判官・弁護士一覧</Link>
-            <Link href="/editorial" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>設計書</Link>
+            <Link href="/map" style={{ fontSize: 13, fontWeight: 600, color: "#b91c1c", textDecoration: "none", border: "1.5px solid #b91c1c", borderRadius: 6, padding: "4px 12px" }}>データを見る</Link>
+            <Link href="/professionals" style={{ fontSize: 13, fontWeight: 600, color: "#b91c1c", textDecoration: "none", border: "1.5px solid #b91c1c", borderRadius: 6, padding: "4px 12px" }}>裁判官・弁護士一覧</Link>
+            <Link href="/editorial" style={{ fontSize: 13, fontWeight: 600, color: "#b91c1c", textDecoration: "none", border: "1.5px solid #b91c1c", borderRadius: 6, padding: "4px 12px" }}>設計書</Link>
             <a
               href="/trials/new"
               style={{ fontSize: 13, fontWeight: 600, background: "#0f172a", color: "#fff", padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}
