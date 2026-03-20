@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Open Justice Editorial | 判決文品質評価 スコアリングシステム 設計書</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Public+Sans:wght@100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "background": "#f8f9fa",
+              "surface-container": "#edeeef",
+              "on-secondary-container": "#575b7f",
+              "tertiary-fixed-dim": "#ffb59d",
+              "on-tertiary-fixed-variant": "#7b2e12",
+              "secondary-fixed-dim": "#c1c3ed",
+              "outline": "#767683",
+              "primary-fixed-dim": "#bdc2ff",
+              "on-primary-container": "#8690ee",
+              "tertiary": "#380b00",
+              "surface-tint": "#4c56af",
+              "secondary": "#585c80",
+              "inverse-on-surface": "#f0f1f2",
+              "tertiary-container": "#5c1800",
+              "on-primary-fixed": "#000767",
+              "inverse-surface": "#2e3132",
+              "on-tertiary-container": "#e17c5a",
+              "on-secondary": "#ffffff",
+              "on-primary": "#ffffff",
+              "secondary-container": "#d2d4ff",
+              "on-secondary-fixed": "#151839",
+              "tertiary-fixed": "#ffdbd0",
+              "surface-container-low": "#f3f4f5",
+              "on-tertiary": "#ffffff",
+              "on-secondary-fixed-variant": "#414467",
+              "on-error-container": "#93000a",
+              "inverse-primary": "#bdc2ff",
+              "on-surface-variant": "#454652",
+              "on-tertiary-fixed": "#390c00",
+              "surface-container-highest": "#e1e3e4",
+              "on-primary-fixed-variant": "#343d96",
+              "error-container": "#ffdad6",
+              "on-surface": "#191c1d",
+              "primary-container": "#1a237e",
+              "surface-bright": "#f8f9fa",
+              "on-background": "#191c1d",
+              "primary": "#000666",
+              "outline-variant": "#c6c5d4",
+              "error": "#ba1a1a",
+              "surface-container-high": "#e7e8e9",
+              "surface": "#f8f9fa",
+              "primary-fixed": "#e0e0ff",
+              "surface-container-lowest": "#ffffff",
+              "surface-dim": "#d9dadb",
+              "secondary-fixed": "#e0e0ff",
+              "surface-variant": "#e1e3e4",
+              "on-error": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Newsreader"],
+              "body": ["Public Sans"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+      body { font-family: 'Public Sans', sans-serif; }
+      .font-serif { font-family: 'Newsreader', serif; }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+</head>
+<body class="bg-background text-on-surface">
+<!-- TopAppBar -->
+<header class="bg-[#f8f9fa] dark:bg-slate-900 border-none sticky top-0 z-50">
+<nav class="flex justify-between items-center w-full px-12 py-6 max-w-[1920px] mx-auto">
+<div class="text-2xl font-serif font-bold text-[#000666] dark:text-white tracking-tighter">
+                Open Justice Editorial
+            </div>
+<div class="hidden md:flex gap-8 items-center font-serif font-medium tracking-tight Newsreader">
+<a class="text-[#000666] dark:text-white border-b-2 border-[#000666] dark:border-[#333dff] pb-1 cursor-pointer active:opacity-70" href="#">Scoring</a>
+<a class="text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors cursor-pointer active:opacity-70" href="#">Frameworks</a>
+<a class="text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors cursor-pointer active:opacity-70" href="#">Resources</a>
+<a class="text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors cursor-pointer active:opacity-70" href="#">About</a>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden lg:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline">search</span>
+<input class="bg-surface-container border-none rounded-lg pl-10 pr-4 py-2 text-sm focus:ring-1 focus:ring-primary w-64" placeholder="Search framework..." type="text"/>
+</div>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">
+                    Sign In
+                </button>
+</div>
+</nav>
+<div class="bg-[#edeeef] dark:bg-slate-800 h-[1px] w-full"></div>
+</header>
+<main class="max-w-[1920px] mx-auto px-12 flex gap-12 mt-12">
+<!-- SideNavBar -->
+<aside class="hidden lg:block sticky left-0 top-24 h-[calc(100vh-6rem)] w-72 rounded-r-lg bg-[#f3f4f5] dark:bg-slate-800/50">
+<div class="flex flex-col gap-2 py-8 pr-4">
+<div class="px-5 mb-8">
+<h3 class="font-sans Public Sans text-sm tracking-wide uppercase text-[#000666] dark:text-[#333dff] font-bold">Framework Axis</h3>
+<p class="text-[10px] text-outline mt-1 uppercase tracking-widest">V. 2.0.4 Editorial</p>
+</div>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-3 bg-white dark:bg-slate-900 text-[#000666] dark:text-white font-bold border-l-4 border-[#000666] dark:border-[#333dff] pl-4 py-3 hover:translate-x-1 transition-transform duration-150 cursor-pointer ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="gavel">gavel</span>
+<span class="font-sans Public Sans text-sm tracking-wide uppercase">Executive Summary</span>
+</a>
+<a class="flex items-center gap-3 text-[#454652] dark:text-slate-400 pl-5 py-3 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:translate-x-1 transition-transform duration-150 cursor-pointer ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="menu_book">menu_book</span>
+<span class="font-sans Public Sans text-sm tracking-wide uppercase">Legal Methodology</span>
+</a>
+<a class="flex items-center gap-3 text-[#454652] dark:text-slate-400 pl-5 py-3 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:translate-x-1 transition-transform duration-150 cursor-pointer ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="query_stats">query_stats</span>
+<span class="font-sans Public Sans text-sm tracking-wide uppercase">Data Transparency</span>
+</a>
+<a class="flex items-center gap-3 text-[#454652] dark:text-slate-400 pl-5 py-3 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:translate-x-1 transition-transform duration-150 cursor-pointer ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="rule">rule</span>
+<span class="font-sans Public Sans text-sm tracking-wide uppercase">Scoring Criteria</span>
+</a>
+<a class="flex items-center gap-3 text-[#454652] dark:text-slate-400 pl-5 py-3 hover:bg-white/50 dark:hover:bg-slate-700/50 hover:translate-x-1 transition-transform duration-150 cursor-pointer ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="balance">balance</span>
+<span class="font-sans Public Sans text-sm tracking-wide uppercase">Judicial Review</span>
+</a>
+</nav>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<div class="flex-1 max-w-5xl">
+<!-- Hero Section -->
+<section class="mb-20">
+<div class="inline-block bg-primary-container/10 text-primary px-3 py-1 rounded text-xs font-bold mb-6 tracking-widest uppercase">
+                    Protocol Document 024-J
+                </div>
+<h1 class="font-headline text-7xl font-bold text-primary tracking-tighter leading-[1.1] mb-8">
+                    判決文品質評価 <br/>スコアリングシステム 設計書
+                </h1>
+<div class="flex items-center gap-8 py-6 border-y border-outline-variant/20">
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-outline">Document Status</span>
+<span class="font-bold text-on-surface">EDITORIAL FINAL</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-outline">Last Revised</span>
+<span class="font-bold text-on-surface">Oct 24, 2024</span>
+</div>
+<div class="w-px h-8 bg-outline-variant/30"></div>
+<div class="flex flex-col">
+<span class="text-[10px] uppercase tracking-widest text-outline">Jurist ID</span>
+<span class="font-bold text-on-surface">OJ-EF-8821</span>
+</div>
+</div>
+</section>
+<!-- Section 01 Introduction -->
+<section class="mb-24">
+<div class="grid grid-cols-12 gap-8 items-start">
+<div class="col-span-4">
+<h2 class="font-serif text-3xl font-bold text-primary mb-4 leading-none">01 <br/>Introduction</h2>
+<div class="h-1 w-12 bg-primary"></div>
+</div>
+<div class="col-span-8 space-y-12">
+<!-- Sub-section 1-1 -->
+<div class="bg-surface-container-lowest p-8 rounded-lg">
+<h3 class="font-headline text-2xl font-bold mb-4 italic">1-1 Project Mandate</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6 font-body">
+                                司法判断の透明性を高め、AI技術を活用した客観的な評価基準を確立するための設計指針。本システムは「法の支配」をデジタル時代に再定義し、判決文の論理性、整合性、及び法的根拠の明確さを多角的にスコアリングします。
+                            </p>
+<div class="grid grid-cols-2 gap-4">
+<div class="bg-surface-container-low p-4 rounded">
+<span class="block font-bold text-primary text-xl">0.98</span>
+<span class="text-xs text-outline uppercase">Precision Target</span>
+</div>
+<div class="bg-surface-container-low p-4 rounded">
+<span class="block font-bold text-primary text-xl">100%</span>
+<span class="text-xs text-outline uppercase">Traceability</span>
+</div>
+</div>
+</div>
+<!-- Sub-section 1-2 -->
+<div>
+<h3 class="font-headline text-2xl font-bold mb-4 italic">1-2 Core Objectives</h3>
+<p class="text-on-surface-variant leading-relaxed mb-6 font-body">
+                                主な目的は、裁判官による判断の質を平準化し、市民に対する説明責任を果たすことにあります。評価エンジンは、単なるテキスト分析を超え、判例との整合性や論理飛躍の有無を検知する高度なセマンティック・アナリシスを基盤とします。
+                            </p>
+<ul class="space-y-4">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-medium">判決理由の論理的整合性の自動検証</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-medium">過去の類似判例との逸脱度の算出</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-primary mt-1" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-medium">文体および法的用語の正確性の評価</span>
+</li>
+</ul>
+</div>
+<!-- Sub-section 1-3 -->
+<div class="relative overflow-hidden group">
+<div class="absolute inset-0 bg-primary opacity-[0.02] pointer-events-none"></div>
+<h3 class="font-headline text-2xl font-bold mb-4 italic">1-3 System Scope</h3>
+<p class="text-on-surface-variant leading-relaxed font-body">
+                                適用範囲は、刑事・民事の第一審および控訴審の判決文全般。特に、社会的影響力の高い事案における「判断の透明性」に焦点を当て、評価結果をパブリック・レジャー（公開台帳）に記録する仕組みを包含します。
+                            </p>
+<div class="mt-8 overflow-hidden rounded-xl bg-surface-container">
+<img class="w-full h-64 object-cover opacity-80 mix-blend-multiply transition-transform duration-700 group-hover:scale-105" data-alt="Close up of a scales of justice in a library" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAM8-xtC1WwKbUQSeQXXKB_7kbRS8tsiekXm5k5Nwmix4iNbuNW0BsoEmaGHSDSTxv9OuM_Gd4QuM4UDf-uP_l3891lkEu9XZcv4CSn773RpB00YiMN1X_O9lHPDionmyYZpz2VPTpnWwmsQViiqjs7-usUXUlrs9XlbfdUW-xbMjSm-NN6hPx0EeDWa2w3S4Xrd6pNuuTeubvw80-d1BPZRgtGYPd0DqwGgmz5pkMuB7hEqtvcTHG8hPYv2RLTBQsiIsZAzE6wJpc"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Side: Key Takeaways & Impact -->
+<aside class="w-80 hidden xl:block">
+<div class="sticky top-32 space-y-10">
+<div class="bg-surface-container-lowest p-8 border-l-4 border-primary shadow-sm">
+<h4 class="font-serif text-xl font-bold mb-6">Key Takeaways</h4>
+<div class="space-y-6">
+<div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-1">Standard 01</p>
+<p class="font-body text-sm font-bold">バイアスフリー評価エンジン</p>
+<p class="text-xs text-on-surface-variant mt-1">属性情報を除外した純粋な法的論理の解析。</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-1">Standard 02</p>
+<p class="font-body text-sm font-bold">リアルタイム・モニタリング</p>
+<p class="text-xs text-on-surface-variant mt-1">司法手続きの進行に合わせた継続的品質チェック。</p>
+</div>
+<div>
+<p class="text-[10px] uppercase tracking-widest text-outline mb-1">Standard 03</p>
+<p class="font-body text-sm font-bold">公開レジャーへの記録</p>
+<p class="text-xs text-on-surface-variant mt-1">改ざん不可能な形でのスコア履歴の保存。</p>
+</div>
+</div>
+</div>
+<div class="bg-primary p-8 text-white rounded-lg">
+<h4 class="font-serif text-xl font-bold mb-4">Social Impact</h4>
+<p class="text-sm opacity-80 leading-relaxed font-body">
+                        本システムの導入により、司法判断の予測可能性が34%向上し、法廷闘争のコスト削減と市民の司法への信頼回復に寄与します。
+                    </p>
+<div class="mt-6 flex items-center justify-between">
+<span class="text-3xl font-serif font-bold">34%</span>
+<div class="h-px bg-white/20 flex-1 mx-4"></div>
+<span class="material-symbols-outlined">trending_up</span>
+</div>
+</div>
+<div class="px-4">
+<p class="text-[10px] text-outline uppercase tracking-[0.2em] mb-4">Share Document</p>
+<div class="flex gap-4">
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">share</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">download</span>
+</button>
+<button class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center hover:bg-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-lg">bookmark</span>
+</button>
+</div>
+</div>
+</div>
+</aside>
+</main>
+<!-- Footer -->
+<footer class="bg-[#edeeef] dark:bg-slate-950 full-width py-16 px-12 mt-20">
+<div class="grid grid-cols-4 gap-12 max-w-[1920px] mx-auto w-full">
+<div class="col-span-1">
+<div class="font-serif text-lg text-[#000666] dark:text-white mb-6">Open Justice Editorial</div>
+<p class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-500 max-w-xs leading-relaxed">
+                    © 2024 Open Justice Editorial. All rights reserved. Issued under Digital Jurist Protocol. Providing authoritative frameworks for digital law.
+                </p>
+</div>
+<div class="col-span-1 flex flex-col gap-3">
+<h5 class="font-bold text-xs uppercase tracking-widest mb-2">Editorial</h5>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Ethics Policy</a>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Privacy Framework</a>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Editorial Board</a>
+</div>
+<div class="col-span-1 flex flex-col gap-3">
+<h5 class="font-bold text-xs uppercase tracking-widest mb-2">Transparency</h5>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Public Ledger</a>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Methodology</a>
+<a class="font-sans Public Sans text-xs text-[#454652] dark:text-slate-400 hover:text-[#000666] dark:hover:text-white transition-colors" href="#">Contact</a>
+</div>
+<div class="col-span-1">
+<h5 class="font-bold text-xs uppercase tracking-widest mb-4">Jurisdiction</h5>
+<div class="flex flex-wrap gap-2">
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded">EU-AI-ACT</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded">D-JURIST-1.0</span>
+<span class="px-2 py-1 bg-surface-container-highest text-[10px] rounded">OPEN-LAW</span>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

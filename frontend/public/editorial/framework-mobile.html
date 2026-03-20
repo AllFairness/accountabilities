@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Framework: Judicial Decision Quality Scoring System</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Public+Sans:wght@300;400;500;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-secondary-fixed": "#151839",
+                "on-tertiary-container": "#e17c5a",
+                "on-error": "#ffffff",
+                "surface-variant": "#e1e3e4",
+                "on-surface-variant": "#454652",
+                "tertiary-container": "#5c1800",
+                "on-error-container": "#93000a",
+                "surface-container-lowest": "#ffffff",
+                "background": "#f8f9fa",
+                "surface-dim": "#d9dadb",
+                "surface": "#f8f9fa",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed": "#390c00",
+                "secondary-fixed": "#e0e0ff",
+                "on-primary-fixed-variant": "#343d96",
+                "primary-fixed": "#e0e0ff",
+                "surface-container": "#edeeef",
+                "secondary": "#585c80",
+                "inverse-surface": "#2e3132",
+                "primary-container": "#1a237e",
+                "on-primary-fixed": "#000767",
+                "on-surface": "#191c1d",
+                "surface-tint": "#4c56af",
+                "on-primary": "#ffffff",
+                "error": "#ba1a1a",
+                "on-secondary-container": "#575b7f",
+                "on-background": "#191c1d",
+                "surface-container-low": "#f3f4f5",
+                "tertiary-fixed": "#ffdbd0",
+                "tertiary-fixed-dim": "#ffb59d",
+                "outline": "#767683",
+                "on-secondary-fixed-variant": "#414467",
+                "surface-bright": "#f8f9fa",
+                "tertiary": "#380b00",
+                "primary-fixed-dim": "#bdc2ff",
+                "secondary-fixed-dim": "#c1c3ed",
+                "error-container": "#ffdad6",
+                "outline-variant": "#c6c5d4",
+                "primary": "#000666",
+                "on-tertiary-fixed-variant": "#7b2e12",
+                "inverse-on-surface": "#f0f1f2",
+                "inverse-primary": "#bdc2ff",
+                "on-primary-container": "#8690ee",
+                "surface-container-highest": "#e1e3e4",
+                "secondary-container": "#d2d4ff",
+                "surface-container-high": "#e7e8e9",
+                "on-tertiary": "#ffffff"
+              },
+              fontFamily: {
+                "headline": ["Newsreader"],
+                "body": ["Public Sans"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+      </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+        h1, h2, h3 { font-family: 'Newsreader', serif; }
+        .label-text { font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.1em; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 no-border bg-[#f3f4f5] transition-colors duration-300">
+<div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary text-3xl" data-icon="gavel">gavel</span>
+<span class="text-2xl font-serif italic tracking-tight text-[#000666]">Open Justice Editorial</span>
+</div>
+<nav class="hidden md:flex gap-8">
+<a class="text-[#000666] font-bold border-b-2 border-[#000666] pb-1" href="#">Framework</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Judgments</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Analytics</a>
+</nav>
+<button class="bg-gradient-to-br from-primary to-primary-container text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-all">
+                Read Document
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-8 py-20">
+<!-- Hero Section -->
+<section class="mb-24 flex flex-col items-center text-center">
+<span class="label-text text-on-surface-variant mb-4 text-xs">Chapter 4 Methodology</span>
+<h1 class="text-6xl font-serif italic text-primary mb-6 max-w-4xl tracking-tight">Judicial Decision Quality Scoring System</h1>
+<p class="text-xl text-on-surface-variant max-w-2xl font-body leading-relaxed">
+                An empirical framework designed to evaluate the integrity, clarity, and procedural fairness of judicial rulings through three distinct axes of assessment.
+            </p>
+</section>
+<!-- The Three Axes: Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-24">
+<!-- Axis 1: Transparency -->
+<div class="md:col-span-8 bg-surface-container-lowest p-8 rounded-xl shadow-sm transition-all hover:translate-y-[-4px]">
+<div class="flex items-start justify-between mb-8">
+<div>
+<span class="label-text text-xs text-on-tertiary-container mb-2 block">stance_axis1</span>
+<h2 class="text-4xl font-serif text-primary">Transparency Score</h2>
+<p class="text-on-surface-variant mt-2 font-medium">Trackable judgments and record integrity.</p>
+</div>
+<span class="material-symbols-outlined text-4xl text-primary-container" data-icon="visibility">visibility</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="space-y-4">
+<p class="text-on-surface leading-relaxed">
+                            Evaluates the accessibility and digital lineage of the judicial record. A high score signifies that every stage of the decision-making process is documented and verifiable by public scrutiny.
+                        </p>
+<ul class="space-y-3">
+<li class="flex items-center gap-3 text-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Metadata Completeness
+                            </li>
+<li class="flex items-center gap-3 text-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                Public Record Availability
+                            </li>
+</ul>
+</div>
+<div class="bg-surface-container-low rounded-lg p-6 flex flex-col justify-center border border-outline-variant/10">
+<div class="text-xs label-text text-on-surface-variant mb-2">Weighting Factor</div>
+<div class="text-5xl font-serif italic text-primary">35%</div>
+<div class="mt-4 h-1 bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[35%]"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Axis 2: Party Responsiveness -->
+<div class="md:col-span-4 bg-surface-container p-8 rounded-xl flex flex-col">
+<span class="label-text text-xs text-on-tertiary-container mb-2 block">stance_axis2</span>
+<span class="material-symbols-outlined text-4xl text-primary mb-6" data-icon="balance">balance</span>
+<h2 class="text-3xl font-serif text-primary mb-4">Party Responsiveness</h2>
+<p class="text-on-surface-variant text-sm leading-relaxed mb-8">
+                    Measures the degree to which the court addressed the specific arguments raised by all parties involved.
+                </p>
+<div class="mt-auto pt-6 border-t border-outline-variant/20">
+<div class="flex justify-between items-end">
+<div class="text-xs label-text text-on-surface-variant">Procedural Justice</div>
+<div class="text-2xl font-serif text-primary">25%</div>
+</div>
+</div>
+</div>
+<!-- Axis 3: Justification Score -->
+<div class="md:col-span-5 bg-surface-container-low p-8 rounded-xl border border-outline-variant/10">
+<span class="label-text text-xs text-on-tertiary-container mb-2 block">stance_axis3</span>
+<h2 class="text-3xl font-serif text-primary mb-4">Justification Score</h2>
+<div class="aspect-video bg-surface-container-lowest rounded-lg mb-6 flex items-center justify-center relative overflow-hidden">
+<img alt="Abstract geometric pattern representing legal logic" class="absolute inset-0 w-full h-full object-cover opacity-10" data-alt="Abstract neural network representing logical judicial reasoning" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqxGKmVvnaOE3Z1llJaTauTKobK4IVZ9gXUKVomp_4vRTBpdJVIidFyp5WkBIW70d1n09ljZBij_fT3DWbZ5KCRWpkGfwkUe3FUYxFooI4LvpkxomPioLUZpfb5iXqkH_gzPfCvm8Oqf4lrLDM6cy-lAv9d1B0Vs3H1ZpYJx1zPZHEZC1t-sso0IdqHTCRxTQzEuPNgv3bTpIWXXQvsfVDbjrFwUZ9o0q_2Ub8iSpdCtaME6oZXkSABKBesTyined3fYYtSW2EYzM"/>
+<span class="material-symbols-outlined text-6xl text-primary/20" data-icon="auto_stories">auto_stories</span>
+</div>
+<p class="text-on-surface-variant mb-6">
+                    Evaluation of substantive reasoning, legal precedent adherence, and the internal logic of the final ruling.
+                </p>
+<div class="flex gap-2">
+<span class="bg-primary-container/10 text-primary text-[10px] label-text px-2 py-1 rounded">Logic Flow</span>
+<span class="bg-primary-container/10 text-primary text-[10px] label-text px-2 py-1 rounded">Precedent</span>
+<span class="bg-primary-container/10 text-primary text-[10px] label-text px-2 py-1 rounded">Clarity</span>
+</div>
+</div>
+<!-- Confidence Level Definition -->
+<div class="md:col-span-7 bg-primary text-white p-10 rounded-xl flex flex-col justify-center relative overflow-hidden">
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary-container rounded-full blur-3xl opacity-20 -mr-20 -mt-20"></div>
+<div class="relative z-10">
+<div class="flex items-center gap-3 mb-6">
+<span class="material-symbols-outlined text-primary-fixed" data-icon="verified_user">verified_user</span>
+<h2 class="text-3xl font-serif italic">Confidence Level Definition</h2>
+</div>
+<p class="text-primary-fixed-dim text-lg mb-8 leading-relaxed max-w-xl">
+                        The Confidence Level represents the statistical reliability of the score. It accounts for the volume of data points available, the presence of conflicting interpretations, and the clarity of the source text.
+                    </p>
+<div class="grid grid-cols-3 gap-4">
+<div class="bg-white/5 p-4 rounded-lg backdrop-blur-sm">
+<div class="text-[10px] label-text opacity-60 mb-1">High</div>
+<div class="text-xl font-serif">&gt; 90%</div>
+</div>
+<div class="bg-white/5 p-4 rounded-lg backdrop-blur-sm">
+<div class="text-[10px] label-text opacity-60 mb-1">Standard</div>
+<div class="text-xl font-serif">75% - 89%</div>
+</div>
+<div class="bg-white/5 p-4 rounded-lg backdrop-blur-sm">
+<div class="text-[10px] label-text opacity-60 mb-1">Provisional</div>
+<div class="text-xl font-serif">&lt; 75%</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Vertical Block Timeline for Framework Implementation -->
+<section class="mt-32">
+<h3 class="text-4xl font-serif italic text-primary mb-12">Scoring Lifecycle</h3>
+<div class="space-y-4">
+<div class="flex gap-8 group">
+<div class="w-1 bg-primary group-hover:w-2 transition-all duration-300"></div>
+<div class="flex-1 bg-surface-container-high p-6 rounded-lg">
+<div class="text-xs label-text text-on-surface-variant mb-1">Phase 01</div>
+<h4 class="font-bold text-primary mb-2">Data Ingestion</h4>
+<p class="text-sm text-on-surface-variant">Primary court transcripts and metadata are parsed via NLP for initial classification.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="w-1 bg-primary group-hover:w-2 transition-all duration-300"></div>
+<div class="flex-1 bg-surface-container-high p-6 rounded-lg">
+<div class="text-xs label-text text-on-surface-variant mb-1">Phase 02</div>
+<h4 class="font-bold text-primary mb-2">Axis-Based Cross-Examination</h4>
+<p class="text-sm text-on-surface-variant">Decision text is evaluated against the Transparency, Responsiveness, and Justification criteria.</p>
+</div>
+</div>
+<div class="flex gap-8 group">
+<div class="w-1 bg-primary group-hover:w-2 transition-all duration-300"></div>
+<div class="flex-1 bg-surface-container-high p-6 rounded-lg">
+<div class="text-xs label-text text-on-surface-variant mb-1">Phase 03</div>
+<h4 class="font-bold text-primary mb-2">Final Certification</h4>
+<p class="text-sm text-on-surface-variant">Manual editorial review confirms the automated Confidence Level before publication.</p>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width py-12 bg-[#edeeef] transition-colors">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center">
+<div class="text-[#000666] text-sm font-sans mb-6 md:mb-0">
+                © 2024 Open Justice Editorial. All rights reserved.
+            </div>
+<div class="flex gap-8">
+<a class="text-[#454652] text-sm font-sans hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="text-[#454652] text-sm font-sans hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Methodology</a>
+<a class="text-[#454652] text-sm font-sans hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

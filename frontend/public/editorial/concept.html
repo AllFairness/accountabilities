@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+
+<html lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400;1,700&amp;family=Public+Sans:wght@300;400;600;700&amp;family=Inter:wght@400;600;800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed": "#151839",
+              "on-tertiary-container": "#e17c5a",
+              "on-error": "#ffffff",
+              "surface-variant": "#e1e3e4",
+              "on-surface-variant": "#454652",
+              "tertiary-container": "#5c1800",
+              "on-error-container": "#93000a",
+              "surface-container-lowest": "#ffffff",
+              "background": "#f8f9fa",
+              "surface-dim": "#d9dadb",
+              "surface": "#f8f9fa",
+              "on-secondary": "#ffffff",
+              "on-tertiary-fixed": "#390c00",
+              "secondary-fixed": "#e0e0ff",
+              "on-primary-fixed-variant": "#343d96",
+              "primary-fixed": "#e0e0ff",
+              "surface-container": "#edeeef",
+              "secondary": "#585c80",
+              "inverse-surface": "#2e3132",
+              "primary-container": "#1a237e",
+              "on-primary-fixed": "#000767",
+              "on-surface": "#191c1d",
+              "surface-tint": "#4c56af",
+              "on-primary": "#ffffff",
+              "error": "#ba1a1a",
+              "on-secondary-container": "#575b7f",
+              "on-background": "#191c1d",
+              "surface-container-low": "#f3f4f5",
+              "tertiary-fixed": "#ffdbd0",
+              "tertiary-fixed-dim": "#ffb59d",
+              "outline": "#767683",
+              "on-secondary-fixed-variant": "#414467",
+              "surface-bright": "#f8f9fa",
+              "tertiary": "#380b00",
+              "primary-fixed-dim": "#bdc2ff",
+              "secondary-fixed-dim": "#c1c3ed",
+              "error-container": "#ffdad6",
+              "outline-variant": "#c6c5d4",
+              "primary": "#000666",
+              "on-tertiary-fixed-variant": "#7b2e12",
+              "inverse-on-surface": "#f0f1f2",
+              "inverse-primary": "#bdc2ff",
+              "on-primary-container": "#8690ee",
+              "surface-container-highest": "#e1e3e4",
+              "secondary-container": "#d2d4ff",
+              "surface-container-high": "#e7e8e9",
+              "on-tertiary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Newsreader", "serif"],
+              "body": ["Public Sans", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body { font-family: 'Public Sans', sans-serif; }
+        .font-serif-italic { font-family: 'Newsreader', serif; font-style: italic; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 no-border bg-[#f3f4f5] transition-colors duration-300">
+<div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#000666]" data-icon="gavel">gavel</span>
+<h1 class="text-2xl font-serif italic tracking-tight text-[#000666]">Open Justice Editorial</h1>
+</div>
+<nav class="hidden md:flex items-center space-x-8">
+<a class="text-[#000666] font-bold border-b-2 border-[#000666] pb-1 uppercase tracking-widest text-xs font-label" href="#">Overview</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all uppercase tracking-widest text-xs font-label" href="#">Methodology</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all uppercase tracking-widest text-xs font-label" href="#">Framework</a>
+</nav>
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-5 py-2 rounded-lg text-sm font-semibold tracking-wide shadow-lg hover:brightness-110 transition-all scale-95 duration-200 ease-in-out">
+                Read Document
+            </button>
+</div>
+</header>
+<main>
+<!-- Hero Section: The Testimony -->
+<section class="relative overflow-hidden bg-surface py-24 md:py-32">
+<div class="max-w-7xl mx-auto px-8 relative z-10">
+<div class="max-w-4xl">
+<span class="inline-block px-4 py-1.5 bg-surface-container-high text-primary font-label text-[10px] uppercase tracking-[0.2em] mb-8">System Design v1.0</span>
+<h2 class="text-5xl md:text-7xl font-serif italic text-primary leading-[1.1] tracking-tight mb-8">
+                        判決文品質評価スコアリングシステム 設計書
+                    </h2>
+<p class="text-xl md:text-2xl text-on-surface-variant font-body font-light leading-relaxed max-w-2xl mb-12">
+                        AIと人間の問答による設計プロセスの公開と透明性の担保
+                    </p>
+<div class="flex flex-wrap gap-6">
+<button class="bg-gradient-to-br from-primary to-primary-container text-on-primary px-8 py-4 rounded-lg font-bold flex items-center gap-3 shadow-xl hover:shadow-primary/20 transition-all">
+                            Explore Framework
+                            <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<button class="px-8 py-4 rounded-lg font-bold text-primary border border-outline-variant/15 flex items-center gap-3 hover:bg-surface-container transition-all">
+                            View Whitepaper
+                        </button>
+</div>
+</div>
+</div>
+<!-- Background Decorative Element (Asymmetric) -->
+<div class="absolute right-0 top-0 w-1/3 h-full bg-surface-container-low -z-0 transform skew-x-[-12deg] translate-x-20"></div>
+</section>
+<!-- Document Core Sections: The Ledger -->
+<section class="py-24 bg-surface-container-low">
+<div class="max-w-7xl mx-auto px-8">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-16">
+<!-- Vertical Block Roadmap (Left) -->
+<div class="md:col-span-4 space-y-1">
+<div class="sticky top-32">
+<h3 class="text-sm font-label uppercase tracking-widest text-on-surface-variant mb-12">Table of Contents</h3>
+<div class="relative pl-6 space-y-0">
+<div class="absolute left-0 top-0 bottom-0 w-px bg-outline-variant/30"></div>
+<div class="relative py-4 group">
+<div class="absolute -left-[1.5px] top-0 bottom-0 w-[3px] bg-primary"></div>
+<span class="block text-primary font-bold text-sm mb-1">Section 01</span>
+<span class="block text-on-surface font-headline italic text-lg">Introduction</span>
+</div>
+<div class="relative py-4 group">
+<span class="block text-on-surface-variant font-medium text-sm mb-1">Section 02</span>
+<span class="block text-on-surface-variant font-headline italic text-lg opacity-60">Technical Schema</span>
+</div>
+<div class="relative py-4 group">
+<span class="block text-on-surface-variant font-medium text-sm mb-1">Section 03</span>
+<span class="block text-on-surface-variant font-headline italic text-lg opacity-60">Scoring Engine</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Content Canvas (Right) -->
+<div class="md:col-span-8 space-y-20">
+<!-- Card: Positioning -->
+<div class="bg-surface-container-lowest p-12 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.04)]">
+<div class="flex items-start justify-between mb-8">
+<h4 class="text-3xl font-serif italic text-primary">1-1 本書の位置づけ</h4>
+<span class="material-symbols-outlined text-primary/30 text-4xl" data-icon="article">article</span>
+</div>
+<p class="font-body text-on-surface-variant leading-relaxed text-lg mb-8">
+                                本書は、司法判断の質を客観的かつ定量的に評価するための「判決文品質評価スコアリングシステム」の基本設計を定義するものである。従来、暗黙知として扱われてきた判決文の論理性や透明性を、デジタルな評価軸へと昇華させる試みの第一歩となる。
+                            </p>
+<div class="h-px bg-surface-container w-full mb-8"></div>
+<div class="grid grid-cols-2 gap-8">
+<div>
+<span class="text-[10px] font-label uppercase tracking-widest text-primary block mb-2">Scope</span>
+<p class="text-sm font-body font-semibold">Institutional Justice</p>
+</div>
+<div>
+<span class="text-[10px] font-label uppercase tracking-widest text-primary block mb-2">Authority</span>
+<p class="text-sm font-body font-semibold">Public Domain</p>
+</div>
+</div>
+</div>
+<!-- Bento Grid: Problem Statement -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="md:col-span-2 bg-primary text-on-primary p-12 rounded-xl">
+<div class="flex items-center gap-4 mb-6">
+<span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="error_outline">error_outline</span>
+<h4 class="text-2xl font-serif italic">1-2 問題意識</h4>
+</div>
+<p class="font-body opacity-90 text-lg leading-relaxed">
+                                    現状の司法制度において、判決に至る論理構造の整合性は属人的な判断に依存しており、市民に対する説明責任の果たされ方にばらつきが存在する。情報の非対称性が信頼の欠如を生む現状を打破する必要がある。
+                                </p>
+</div>
+<div class="bg-surface-container p-8 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="visibility_off">visibility_off</span>
+<h5 class="font-body font-bold mb-2">不透明な評価基準</h5>
+<p class="text-sm text-on-surface-variant font-body">判決文がなぜその評価を得るのか、根拠となる論理的ステップが外部から不可視である。</p>
+</div>
+<div class="bg-surface-container p-8 rounded-xl border border-outline-variant/10">
+<span class="material-symbols-outlined text-primary mb-4" data-icon="sync_problem">sync_problem</span>
+<h5 class="font-body font-bold mb-2">一貫性の欠如</h5>
+<p class="text-sm text-on-surface-variant font-body">同種の事案においても、文体や構成の差異が本質的な質の差異として誤認されるリスク。</p>
+</div>
+</div>
+<!-- Card: Goal Setting -->
+<div class="bg-surface-container-lowest p-12 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.04)] relative overflow-hidden">
+<div class="relative z-10">
+<h4 class="text-3xl font-serif italic text-primary mb-8">1-3 最終ゴールの設定</h4>
+<div class="space-y-6">
+<div class="flex gap-6 items-start">
+<div class="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0 mt-1">
+<span class="text-primary font-label font-extrabold text-xs">01</span>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface mb-1">司法の透明化</p>
+<p class="text-on-surface-variant text-sm">AIによる多角的な分析を通じて、判決文の論理的整合性を誰もが確認できる環境の構築。</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<div class="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0 mt-1">
+<span class="text-primary font-label font-extrabold text-xs">02</span>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface mb-1">標準化された評価基盤</p>
+<p class="text-on-surface-variant text-sm">主観を排し、共通のパラメーターに基づいた公平な品質スコアリングの実現。</p>
+</div>
+</div>
+<div class="flex gap-6 items-start">
+<div class="w-8 h-8 rounded-full bg-primary/5 flex items-center justify-center shrink-0 mt-1">
+<span class="text-primary font-label font-extrabold text-xs">03</span>
+</div>
+<div>
+<p class="font-body font-bold text-on-surface mb-1">AIと人間の共創設計</p>
+<p class="text-on-surface-variant text-sm">設計プロセス自体を公開し、対話的なアルゴリズム改善サイクルを回すこと。</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Background Accent -->
+<div class="absolute -right-10 -bottom-10 opacity-[0.03]">
+<span class="material-symbols-outlined text-[200px]" data-icon="balance">balance</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Institutional CTA Section -->
+<section class="py-32 bg-primary">
+<div class="max-w-7xl mx-auto px-8 text-center">
+<h3 class="text-4xl md:text-5xl font-serif italic text-white mb-10 leading-tight">
+                    情報の透明性は、公正な社会の礎である。
+                </h3>
+<p class="text-on-primary-container font-body text-xl max-w-2xl mx-auto mb-16 font-light">
+                    この設計書は、単なるシステムの青写真ではなく、法の支配を技術で補完するためのマニフェストです。
+                </p>
+<div class="inline-flex items-center p-1 bg-white/10 backdrop-blur-md rounded-full">
+<input class="bg-transparent border-none text-white focus:ring-0 px-6 py-2 w-64 text-sm font-label placeholder:text-white/40" placeholder="Enter registration code..." type="text"/>
+<button class="bg-white text-primary px-8 py-3 rounded-full font-bold hover:bg-surface-container-low transition-all">
+                        Request Access
+                    </button>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width py-12 bg-[#edeeef] transition-opacity opacity-80 hover:opacity-100">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="text-on-surface-variant font-sans text-sm">
+                © 2024 Open Justice Editorial. All rights reserved.
+            </div>
+<div class="flex gap-12">
+<a class="text-[#454652] font-medium hover:text-[#000666] transition-all font-sans text-sm" href="#">Contact</a>
+<a class="text-[#454652] font-medium hover:text-[#000666] transition-all font-sans text-sm" href="#">Methodology</a>
+<a class="text-[#454652] font-medium hover:text-[#000666] transition-all font-sans text-sm" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

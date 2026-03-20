@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Judicial Decision Quality Scoring System Design Document</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&amp;family=Public+Sans:ital,wght@0,100..900;1,100..900&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-tint": "#4c56af",
+                        "tertiary-container": "#5c1800",
+                        "outline-variant": "#c6c5d4",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container-low": "#f3f4f5",
+                        "surface-container-high": "#e7e8e9",
+                        "secondary": "#585c80",
+                        "tertiary-fixed": "#ffdbd0",
+                        "on-tertiary-fixed-variant": "#7b2e12",
+                        "on-secondary": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "secondary-fixed-dim": "#c1c3ed",
+                        "on-surface-variant": "#454652",
+                        "on-secondary-fixed-variant": "#414467",
+                        "on-secondary-container": "#575b7f",
+                        "inverse-surface": "#2e3132",
+                        "on-secondary-fixed": "#151839",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f8f9fa",
+                        "primary-container": "#1a237e",
+                        "on-tertiary-fixed": "#390c00",
+                        "on-background": "#191c1d",
+                        "surface-container-highest": "#e1e3e4",
+                        "inverse-on-surface": "#f0f1f2",
+                        "outline": "#767683",
+                        "tertiary": "#380b00",
+                        "primary": "#000666",
+                        "on-primary-fixed-variant": "#343d96",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "on-tertiary-container": "#e17c5a",
+                        "error": "#ba1a1a",
+                        "surface": "#f8f9fa",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "on-primary-fixed": "#000767",
+                        "surface-variant": "#e1e3e4",
+                        "on-primary-container": "#8690ee",
+                        "on-surface": "#191c1d",
+                        "secondary-fixed": "#e0e0ff",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#e0e0ff",
+                        "surface-container": "#edeeef",
+                        "secondary-container": "#d2d4ff",
+                        "background": "#f8f9fa",
+                        "inverse-primary": "#bdc2ff",
+                        "tertiary-fixed-dim": "#ffb59d"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader"],
+                        "body": ["Public Sans"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        .editorial-gradient {
+            background: linear-gradient(135deg, #000666 0%, #1a237e 100%);
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopNavBar -->
+<nav class="bg-[#f8f9fa] dark:bg-[#191c1d] flex justify-between items-center px-8 py-4 max-w-7xl mx-auto w-full border-b-0">
+<div class="font-serif text-2xl font-bold tracking-tighter text-[#000666] dark:text-[#d6e2ff]">Open Justice</div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="font-serif text-lg tracking-tight font-semibold Newsreader text-[#000666] dark:text-[#d6e2ff] font-bold border-b-2 border-[#000666] dark:border-[#d6e2ff] pb-1 hover:text-[#000666] dark:hover:text-[#ffffff] transition-colors duration-300" href="#">Home</a>
+<a class="font-serif text-lg tracking-tight font-semibold Newsreader text-[#454652] dark:text-[#c6c5d4] font-medium hover:text-[#000666] dark:hover:text-[#ffffff] transition-colors duration-300" href="#">Framework</a>
+<a class="font-serif text-lg tracking-tight font-semibold Newsreader text-[#454652] dark:text-[#c6c5d4] font-medium hover:text-[#000666] dark:hover:text-[#ffffff] transition-colors duration-300" href="#">Methodology</a>
+<a class="font-serif text-lg tracking-tight font-semibold Newsreader text-[#454652] dark:text-[#c6c5d4] font-medium hover:text-[#000666] dark:hover:text-[#ffffff] transition-colors duration-300" href="#">Resources</a>
+</div>
+<div class="flex items-center gap-4">
+<span class="text-sm font-label uppercase tracking-widest text-on-surface-variant">JP/EN</span>
+<span class="material-symbols-outlined text-primary cursor-pointer" data-icon="search">search</span>
+</div>
+</nav>
+<main class="max-w-7xl mx-auto px-8 md:px-12 py-12 space-y-20">
+<!-- Hero Section -->
+<header class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-end border-b-0">
+<div class="lg:col-span-8 space-y-6">
+<div class="inline-block px-3 py-1 bg-surface-container-high rounded-full">
+<span class="text-xs font-label font-bold tracking-[0.2em] text-primary uppercase">Official Design Document v2.4</span>
+</div>
+<h1 class="font-headline text-6xl md:text-8xl font-bold tracking-tighter leading-none text-primary">
+                    Judicial Decision Quality Scoring System
+                </h1>
+<p class="font-headline text-2xl text-on-surface-variant max-w-2xl leading-relaxed italic">
+                    Building a framework for judicial accountability through AI-driven transparency and standardized evaluative metrics.
+                </p>
+</div>
+<div class="lg:col-span-4 flex flex-col items-end pb-2">
+<div class="text-right">
+<p class="font-label text-xs uppercase tracking-widest text-outline mb-1">Date of Issue</p>
+<p class="font-body font-semibold">October 24, 2024</p>
+</div>
+</div>
+</header>
+<!-- Bento Layout for Sections 1-1, 1-2, 1-3 -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+<!-- Section 1-1: Project Mandate (Asymmetric large card) -->
+<section class="md:col-span-7 bg-surface-container-lowest p-8 md:p-12 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.04)] flex flex-col justify-between">
+<div>
+<div class="flex items-center gap-3 mb-8">
+<span class="font-label text-sm font-bold text-primary">1-1</span>
+<div class="h-px flex-grow bg-surface-container-highest"></div>
+</div>
+<h2 class="font-headline text-4xl font-bold mb-6 text-primary tracking-tight">Project Mandate</h2>
+<p class="font-body text-lg text-on-surface-variant leading-loose mb-8">
+                        The "Open Justice" initiative seeks to transform the judiciary from an opaque black box into a transparent, data-driven institution. By leveraging large language models (LLMs) and specialized legal AI, we extract structured insights from thousands of court records to improve public oversight and internal consistency.
+                    </p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="p-4 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="visibility">visibility</span>
+<h4 class="font-label text-xs font-bold uppercase tracking-tighter mb-1">Transparency</h4>
+<p class="text-xs text-on-surface-variant">Opening access to judicial logic.</p>
+</div>
+<div class="p-4 bg-surface-container-low rounded-lg">
+<span class="material-symbols-outlined text-primary mb-2" data-icon="psychology">psychology</span>
+<h4 class="font-label text-xs font-bold uppercase tracking-tighter mb-1">AI Integration</h4>
+<p class="text-xs text-on-surface-variant">Unbiased pattern recognition.</p>
+</div>
+</div>
+</section>
+<!-- Section 1-2: Core Objectives (Stacked vertical cards) -->
+<section class="md:col-span-5 flex flex-col gap-6">
+<div class="bg-primary text-on-primary p-8 rounded-xl editorial-gradient flex-1">
+<div class="flex items-center gap-3 mb-6">
+<span class="font-label text-sm font-bold opacity-70">1-2</span>
+<h2 class="font-headline text-2xl font-bold">Core Objectives</h2>
+</div>
+<ul class="space-y-6">
+<li class="flex gap-4">
+<span class="font-headline text-3xl opacity-30 italic">01</span>
+<div>
+<h3 class="font-body font-bold text-lg leading-tight">Standardizing Quality</h3>
+<p class="text-sm opacity-80 mt-1">Creating a universal rubric for clarity, logic, and adherence to precedent.</p>
+</div>
+</li>
+<li class="flex gap-4 border-t border-white/10 pt-6">
+<span class="font-headline text-3xl opacity-30 italic">02</span>
+<div>
+<h3 class="font-body font-bold text-lg leading-tight">Accountability</h3>
+<p class="text-sm opacity-80 mt-1">Identifying statistical outliers in sentencing and legal reasoning for review.</p>
+</div>
+</li>
+</ul>
+</div>
+<!-- Section 1-3: System Scope (Glassmorphism look) -->
+<div class="bg-surface-container-high p-8 rounded-xl border border-white/20 backdrop-blur-sm">
+<div class="flex items-center gap-3 mb-4">
+<span class="font-label text-sm font-bold text-primary">1-3</span>
+<h2 class="font-headline text-2xl font-bold text-primary">System Scope</h2>
+</div>
+<div class="space-y-4">
+<div class="flex items-center justify-between text-sm">
+<span class="font-body text-on-surface-variant">Civil Litigation</span>
+<span class="font-label font-bold text-primary">In Scope</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-full"></div>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="font-body text-on-surface-variant">Criminal Verdicts</span>
+<span class="font-label font-bold text-primary">In Scope</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-primary h-full w-full"></div>
+</div>
+<div class="flex items-center justify-between text-sm">
+<span class="font-body text-on-surface-variant">Administrative Law</span>
+<span class="font-label font-bold text-outline">Phase 2</span>
+</div>
+<div class="w-full h-1 bg-surface-container-highest rounded-full overflow-hidden">
+<div class="bg-outline h-full w-1/3"></div>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Featured Analysis Area -->
+<section class="space-y-8 py-10 border-t border-surface-container-highest">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<h3 class="font-headline text-3xl font-bold text-primary">Framework Methodology Visualization</h3>
+<button class="font-label text-xs font-bold uppercase tracking-widest text-primary border border-outline-variant/30 px-6 py-2 rounded-full hover:bg-surface-container-low transition-colors">
+                    View Methodology Docs
+                </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+<!-- Data Extraction Card -->
+<div class="bg-surface-container-lowest p-6 rounded-lg space-y-4 shadow-sm border border-surface-container-low">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="analytics">analytics</span>
+<h4 class="font-headline text-xl font-bold">Semantic Analysis</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Deconstructing sentence structure and judicial sentiment using BERT-based models.</p>
+</div>
+<!-- Precedent Mapping -->
+<div class="bg-surface-container-lowest p-6 rounded-lg space-y-4 shadow-sm border border-surface-container-low">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="account_tree">account_tree</span>
+<h4 class="font-headline text-xl font-bold">Precedent Mapping</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Cross-referencing citations against established high-court precedents automatically.</p>
+</div>
+<!-- Bias Detection -->
+<div class="bg-surface-container-lowest p-6 rounded-lg space-y-4 shadow-sm border border-surface-container-low">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="gavel">gavel</span>
+<h4 class="font-headline text-xl font-bold">Bias Detection</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Statistical monitoring for socio-economic or demographic discrepancies in outcomes.</p>
+</div>
+<!-- Public Clarity -->
+<div class="bg-surface-container-lowest p-6 rounded-lg space-y-4 shadow-sm border border-surface-container-low">
+<span class="material-symbols-outlined text-primary text-4xl" data-icon="menu_book">menu_book</span>
+<h4 class="font-headline text-xl font-bold">Public Clarity</h4>
+<p class="text-xs text-on-surface-variant leading-relaxed">Evaluating the legibility and "plain language" accessibility of judicial opinions.</p>
+</div>
+</div>
+</section>
+<!-- Call to Action Section -->
+<section class="bg-surface-container rounded-3xl p-12 md:p-20 text-center space-y-8 relative overflow-hidden">
+<div class="relative z-10 max-w-2xl mx-auto space-y-6">
+<h2 class="font-headline text-5xl font-bold text-primary leading-tight">Contribute to the Judiciary Evolution.</h2>
+<p class="font-body text-on-surface-variant text-lg">Our open-source framework is currently under peer review with legal experts and data scientists.</p>
+<div class="flex flex-col sm:flex-row gap-4 justify-center">
+<button class="bg-primary text-on-primary font-label font-bold uppercase tracking-widest px-10 py-4 rounded-lg shadow-lg hover:opacity-90 transition-opacity editorial-gradient">
+                        Download Whitepaper
+                    </button>
+<button class="bg-transparent border border-outline-variant text-primary font-label font-bold uppercase tracking-widest px-10 py-4 rounded-lg hover:bg-surface-container-lowest transition-colors">
+                        Access API Portal
+                    </button>
+</div>
+</div>
+<!-- Decorative Background Element -->
+<div class="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
+<div class="absolute bottom-0 left-0 w-96 h-96 bg-primary/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-3xl"></div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#edeeef] dark:bg-[#1e2021] flex flex-col md:flex-row justify-between items-center px-12 py-10 w-full mt-20">
+<div class="space-y-4 md:space-y-0 text-center md:text-left">
+<div class="font-serif text-xl font-bold text-[#000666] dark:text-[#d6e2ff]">Open Justice Editorial</div>
+<p class="font-sans text-sm tracking-normal Public Sans text-[#454652] dark:text-[#c6c5d4] mt-2">© 2024 Open Justice Editorial. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8 mt-8 md:mt-0">
+<a class="font-sans text-sm tracking-normal Public Sans text-[#454652] dark:text-[#c6c5d4] hover:text-[#000666] dark:hover:text-[#ffffff] transition-all" href="#">Privacy Policy</a>
+<a class="font-sans text-sm tracking-normal Public Sans text-[#454652] dark:text-[#c6c5d4] hover:text-[#000666] dark:hover:text-[#ffffff] transition-all" href="#">Terms of Service</a>
+<a class="font-sans text-sm tracking-normal Public Sans text-[#454652] dark:text-[#c6c5d4] hover:text-[#000666] dark:hover:text-[#ffffff] transition-all" href="#">Contact</a>
+<a class="font-sans text-sm tracking-normal Public Sans text-[#454652] dark:text-[#c6c5d4] hover:text-[#000666] dark:hover:text-[#ffffff] transition-all" href="#">Data Sovereignty</a>
+</div>
+</footer>
+</body></html>

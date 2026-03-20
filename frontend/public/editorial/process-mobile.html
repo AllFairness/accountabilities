@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>設計プロセスの透明性 | Open Justice Editorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400;1,600;1,700&amp;family=Public+Sans:wght@300;400;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#151839",
+                        "on-tertiary-container": "#e17c5a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#454652",
+                        "tertiary-container": "#5c1800",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#390c00",
+                        "secondary-fixed": "#e0e0ff",
+                        "on-primary-fixed-variant": "#343d96",
+                        "primary-fixed": "#e0e0ff",
+                        "surface-container": "#edeeef",
+                        "secondary": "#585c80",
+                        "inverse-surface": "#2e3132",
+                        "primary-container": "#1a237e",
+                        "on-primary-fixed": "#000767",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#4c56af",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#575b7f",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "outline": "#767683",
+                        "on-secondary-fixed-variant": "#414467",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary": "#380b00",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "secondary-fixed-dim": "#c1c3ed",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c6c5d4",
+                        "primary": "#000666",
+                        "on-tertiary-fixed-variant": "#7b2e12",
+                        "inverse-on-surface": "#f0f1f2",
+                        "inverse-primary": "#bdc2ff",
+                        "on-primary-container": "#8690ee",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary-container": "#d2d4ff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem" },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .judicial-gradient {
+            background: linear-gradient(135deg, #000666 0%, #1a237e 100%);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="bg-[#f3f4f5] transition-colors duration-300 docked full-width top-0 sticky z-50">
+<div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary" data-icon="gavel">gavel</span>
+<h1 class="text-2xl font-serif italic tracking-tight text-[#000666]">Open Justice Editorial</h1>
+</div>
+<nav class="hidden md:flex gap-8 items-center">
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Archive</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Methodology</a>
+<a class="text-[#000666] font-bold border-b-2 border-[#000666] pb-1" href="#">Transparency</a>
+</nav>
+<button class="judicial-gradient text-on-primary px-6 py-2 rounded-lg font-medium text-sm transition-all hover:scale-95 duration-200 ease-in-out">
+                Read Document
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-8 pt-20 pb-32">
+<!-- Hero Section -->
+<section class="mb-24 flex flex-col md:flex-row gap-12 items-end">
+<div class="md:w-2/3">
+<p class="font-label uppercase tracking-widest text-on-surface-variant text-sm mb-4">Process Transparency</p>
+<h2 class="font-headline italic text-7xl md:text-8xl text-primary leading-none tracking-tight">設計プロセスの透明性</h2>
+<div class="mt-12 h-1 w-24 judicial-gradient"></div>
+</div>
+<div class="md:w-1/3 bg-surface-container-low p-8 rounded-xl">
+<p class="text-on-surface-variant leading-relaxed">
+                    司法判断の質を数値化する「スコアリングシステム」の根幹は、その設計過程自体の誠実さにあります。AIと人間の対話を通じて磨かれた倫理的フレームワークの全記録を公開します。
+                </p>
+</div>
+</section>
+<!-- Bento Grid for Framework Content -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-32">
+<!-- Chapter 2 Card -->
+<div class="md:col-span-7 bg-surface-container-lowest p-10 rounded-xl">
+<div class="flex items-start justify-between mb-8">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Chapter 02</span>
+<h3 class="font-headline text-3xl mt-2">客観性と透明性の基準</h3>
+</div>
+<span class="material-symbols-outlined text-primary-container opacity-20 text-5xl" data-icon="account_balance">account_balance</span>
+</div>
+<div class="space-y-6 text-on-surface leading-loose">
+<p>
+                        本システムは、法曹界の専門知とデータサイエンスの融合点を目指しています。Chapter 2では、判決文における論理の整合性と、先行判例との乖離率をどのように「ノイズ」として検出するか、その数学的定義を確立しました。
+                    </p>
+<div class="bg-surface-container-low p-6 rounded-lg border-l-4 border-primary">
+<p class="font-label text-xs text-on-surface-variant mb-2">Core Principle</p>
+<p class="font-medium italic">"透明性は単なる開示ではなく、検証可能性の提供である。"</p>
+</div>
+</div>
+</div>
+<!-- Chapter 5 Card (Asymmetric) -->
+<div class="md:col-span-5 bg-primary-container text-on-primary p-10 rounded-xl flex flex-col justify-between">
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-primary-container">Chapter 05</span>
+<h3 class="font-headline text-3xl mt-2">バイアス検知のアルゴリズム</h3>
+<p class="mt-8 text-on-primary-container leading-relaxed">
+                        人間が気づかない潜在的な言語的偏向を、AIがどのように特定し、デザイナーがそれをいかに法理学的解釈に落とし込んだか。動的な調整プロセスの詳細。
+                    </p>
+</div>
+<div class="mt-12">
+<img class="w-full h-48 object-cover rounded-lg mix-blend-luminosity opacity-40" data-alt="Close up of a marble statue of Lady Justice in soft lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCbuEC9wH58uffZpaUCPV6lwqfTwlV_y9EqTChXJDGXGptAhVErfTY2dut56izb8leu7G115GkkQmpSe7oWnX4tsgd84DIi6krl_mI9VBIGkCWsdtFcmFBmDe9uL5f8QHFiEEdW7RQ2MyxjNilkCGk4DGhp2czmY7dLUhFgb4S-254uLghyFgm2vqPLnyxxVF7M9v8ejebzhxUQz8MvEzTFqHUjnnpGr7d6SweIxrDUpvgrhc_RdGDlfkpMRSE7tQv7cnXleiJXG5E"/>
+</div>
+</div>
+</div>
+<!-- Dialogue Interaction Section -->
+<section class="bg-surface-container-low rounded-3xl p-8 md:p-16">
+<div class="max-w-4xl mx-auto">
+<div class="text-center mb-16">
+<span class="material-symbols-outlined text-primary text-4xl mb-4" data-icon="forum">forum</span>
+<h3 class="font-headline text-4xl italic mb-4">問答の記録</h3>
+<p class="font-label text-on-surface-variant uppercase tracking-widest text-sm">Log of Dialogues: AI &amp; Human Designer</p>
+</div>
+<!-- Chat Interface -->
+<div class="space-y-12 relative">
+<!-- Vertical Timeline Thread -->
+<div class="absolute left-[24px] md:left-1/2 top-0 bottom-0 w-[1px] bg-outline-variant opacity-30 -translate-x-1/2 hidden md:block"></div>
+<!-- Human Message -->
+<div class="flex flex-col md:flex-row items-start gap-6 relative">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0 z-10 border-4 border-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+</div>
+<div class="flex-1 glass-panel p-8 rounded-2xl rounded-tl-none shadow-sm">
+<span class="font-label text-xs font-bold text-primary tracking-widest uppercase mb-3 block">Human Designer</span>
+<p class="text-lg leading-relaxed text-on-surface">
+                                「判決の公平性」を数値化する際、裁判官の過去の傾向を過度に反映させると、新たな司法解釈の可能性を奪うことになりませんか？このジレンマを解消するための重み付けが必要です。
+                            </p>
+</div>
+<div class="hidden md:block w-1/2"></div>
+</div>
+<!-- AI Message -->
+<div class="flex flex-col md:flex-row-reverse items-start gap-6 relative">
+<div class="w-12 h-12 rounded-full judicial-gradient flex items-center justify-center flex-shrink-0 z-10 border-4 border-surface-container-low shadow-lg">
+<span class="material-symbols-outlined text-on-primary" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="flex-1 bg-primary text-on-primary p-8 rounded-2xl rounded-tr-none shadow-xl">
+<span class="font-label text-xs font-bold text-on-primary-container tracking-widest uppercase mb-3 block">AI Assistant (Gemini)</span>
+<p class="text-lg leading-relaxed">
+                                ご指摘は重要です。過去の統計のみに依拠するのではなく、法科大学院での標準的な論理構成からどの程度逸脱しているかを測定する「論理的特異点モデル」の導入を提案します。これにより、伝統と革新を分断せずにスコアリング可能です。
+                            </p>
+<div class="mt-6 pt-6 border-t border-white/10 grid grid-cols-2 gap-4">
+<div>
+<span class="text-[10px] uppercase opacity-60">Proposed Logic</span>
+<p class="text-sm font-medium">Deviation Vector Analysis</p>
+</div>
+<div>
+<span class="text-[10px] uppercase opacity-60">Confidence Score</span>
+<p class="text-sm font-medium">94.2% Theoretical Fit</p>
+</div>
+</div>
+</div>
+<div class="hidden md:block w-1/2"></div>
+</div>
+<!-- Human Message 2 -->
+<div class="flex flex-col md:flex-row items-start gap-6 relative">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center flex-shrink-0 z-10 border-4 border-surface-container-low">
+<span class="material-symbols-outlined text-primary" data-icon="person">person</span>
+</div>
+<div class="flex-1 glass-panel p-8 rounded-2xl rounded-tl-none shadow-sm">
+<span class="font-label text-xs font-bold text-primary tracking-widest uppercase mb-3 block">Human Designer</span>
+<p class="text-lg leading-relaxed text-on-surface">
+                                そのモデルであれば、特異点が「独創的な進化」なのか「論理的飛躍」なのかを識別するためのパラメーターをChapter 5のバイアス検知と統合しましょう。透明性を担保するため、この識別根拠もログとして残すべきです。
+                            </p>
+</div>
+<div class="hidden md:block w-1/2"></div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-[#edeeef] full-width py-12">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center gap-8">
+<p class="font-sans text-sm Public Sans text-[#454652]">© 2024 Open Justice Editorial. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="text-[#454652] hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Contact</a>
+<a class="text-[#454652] hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Methodology</a>
+<a class="text-[#454652] hover:text-[#000666] transition-opacity opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>

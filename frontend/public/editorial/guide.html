@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+
+<html lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Webサイト公開・操作ガイド | Open Justice Editorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,700;1,400&amp;family=Public+Sans:wght@300;400;500;700&amp;family=Inter:wght@400;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "surface-container-highest": "#e1e3e4",
+                "on-tertiary-container": "#e17c5a",
+                "surface-tint": "#4c56af",
+                "surface-variant": "#e1e3e4",
+                "surface-container-lowest": "#ffffff",
+                "secondary-fixed": "#e0e0ff",
+                "error": "#ba1a1a",
+                "on-secondary": "#ffffff",
+                "on-surface": "#191c1d",
+                "surface": "#f8f9fa",
+                "error-container": "#ffdad6",
+                "surface-container-low": "#f3f4f5",
+                "tertiary": "#380b00",
+                "on-secondary-fixed-variant": "#414467",
+                "on-tertiary-fixed": "#390c00",
+                "surface-container-high": "#e7e8e9",
+                "primary-fixed": "#e0e0ff",
+                "on-secondary-container": "#575b7f",
+                "on-error-container": "#93000a",
+                "outline-variant": "#c6c5d4",
+                "on-surface-variant": "#454652",
+                "on-tertiary-fixed-variant": "#7b2e12",
+                "on-primary-container": "#8690ee",
+                "primary-container": "#1a237e",
+                "surface-dim": "#d9dadb",
+                "secondary-fixed-dim": "#c1c3ed",
+                "on-tertiary": "#ffffff",
+                "surface-container": "#edeeef",
+                "on-primary-fixed-variant": "#343d96",
+                "on-background": "#191c1d",
+                "tertiary-fixed": "#ffdbd0",
+                "tertiary-container": "#5c1800",
+                "surface-bright": "#f8f9fa",
+                "inverse-on-surface": "#f0f1f2",
+                "secondary": "#585c80",
+                "tertiary-fixed-dim": "#ffb59d",
+                "inverse-primary": "#bdc2ff",
+                "outline": "#767683",
+                "secondary-container": "#d2d4ff",
+                "primary-fixed-dim": "#bdc2ff",
+                "on-secondary-fixed": "#151839",
+                "on-primary": "#ffffff",
+                "on-error": "#ffffff",
+                "primary": "#000666",
+                "on-primary-fixed": "#000767",
+                "background": "#f8f9fa",
+                "inverse-surface": "#2e3132"
+              },
+              fontFamily: {
+                "headline": ["Newsreader"],
+                "body": ["Public Sans"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .serif-italic { font-family: 'Newsreader'; font-style: italic; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-white">
+<!-- TopNavBar -->
+<header class="bg-[#f8f9fa] dark:bg-slate-900 sticky top-0 z-50">
+<div class="flex justify-between items-center w-full px-8 py-4 max-w-screen-2xl mx-auto">
+<div class="text-2xl font-['Newsreader'] italic text-[#000666] dark:text-blue-200">Open Justice Editorial</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#000666] dark:text-white border-b-2 border-[#000666] dark:border-blue-400 pb-1 font-['Newsreader'] tracking-tight font-bold text-lg" href="#">Deployment</a>
+<a class="text-[#454652] dark:text-slate-400 font-medium font-['Public_Sans'] hover:text-[#1A237E] dark:hover:text-blue-300 transition-colors duration-200" href="#">GitHub Docs</a>
+<a class="text-[#454652] dark:text-slate-400 font-medium font-['Public_Sans'] hover:text-[#1A237E] dark:hover:text-blue-300 transition-colors duration-200" href="#">Vercel Setup</a>
+<a class="text-[#454652] dark:text-slate-400 font-medium font-['Public_Sans'] hover:text-[#1A237E] dark:hover:text-blue-300 transition-colors duration-200" href="#">AWS Guide</a>
+<a class="text-[#454652] dark:text-slate-400 font-medium font-['Public_Sans'] hover:text-[#1A237E] dark:hover:text-blue-300 transition-colors duration-200" href="#">JP/EN Config</a>
+</nav>
+<button class="bg-primary text-white px-6 py-2 rounded-md font-medium hover:opacity-90 transition-all active:scale-95 duration-150">Export HTML</button>
+</div>
+<div class="bg-[#edeeef] dark:bg-slate-800 h-[1px] w-full"></div>
+</header>
+<div class="flex min-h-screen">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-18 h-full w-64 bg-[#f3f4f5] dark:bg-slate-950 flex flex-col p-4 space-y-4 hidden lg:flex">
+<div class="py-4 border-b border-outline-variant/15">
+<div class="font-['Newsreader'] text-xl text-[#000666]">System Manual</div>
+<div class="text-xs text-on-surface-variant font-label mt-1">v1.0.4 Judicial Core</div>
+</div>
+<nav class="flex flex-col space-y-1 pt-4">
+<a class="flex items-center gap-3 p-3 text-[#454652] dark:text-slate-500 hover:bg-[#edeeef] dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm">Operations Overview</span>
+</a>
+<a class="flex items-center gap-3 p-3 bg-[#ffffff] dark:bg-slate-800 text-[#000666] dark:text-white font-bold rounded-lg shadow-sm" href="#">
+<span class="material-symbols-outlined">html</span>
+<span class="text-sm">Manual Export</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-[#454652] dark:text-slate-500 hover:bg-[#edeeef] dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">terminal</span>
+<span class="text-sm">Version Control</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-[#454652] dark:text-slate-500 hover:bg-[#edeeef] dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">cloud_upload</span>
+<span class="text-sm">Cloud Hosting</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-[#454652] dark:text-slate-500 hover:bg-[#edeeef] dark:hover:bg-slate-900 hover:translate-x-1 transition-transform duration-200 rounded-lg" href="#">
+<span class="material-symbols-outlined">translate</span>
+<span class="text-sm">Localization</span>
+</a>
+</nav>
+<div class="mt-auto pb-24 space-y-4">
+<button class="w-full bg-surface-container-high py-3 px-4 rounded-lg text-primary font-bold text-xs uppercase tracking-wider hover:bg-surface-container-highest transition-colors">
+                    Technical Support
+                </button>
+<div class="flex flex-col gap-1 border-t border-outline-variant/15 pt-4">
+<a class="flex items-center gap-3 p-2 text-xs text-[#454652]" href="#"><span class="material-symbols-outlined text-sm">shield_lock</span> Security Settings</a>
+<a class="flex items-center gap-3 p-2 text-xs text-[#454652]" href="#"><span class="material-symbols-outlined text-sm">logout</span> Logout</a>
+</div>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="flex-1 lg:ml-64 p-8 md:p-12 lg:p-20 bg-surface">
+<!-- Hero Header -->
+<section class="max-w-5xl mx-auto mb-20">
+<span class="font-label text-xs uppercase tracking-[0.2em] text-on-surface-variant mb-4 block">Onboarding &amp; Deployment</span>
+<h1 class="font-headline text-5xl md:text-6xl text-primary font-bold tracking-tight mb-6">Webサイト公開・操作ガイド</h1>
+<p class="font-body text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+                    Open Justice Editorialへようこそ。このガイドでは、作成したコンテンツをWebサイトとして世界に公開するための5つのステップを解説します。
+                </p>
+</section>
+<!-- Deployment Flow: Vertical Block Approach -->
+<section class="max-w-5xl mx-auto space-y-12">
+<!-- Step 1 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-primary"></div>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-primary text-white w-8 h-8 flex items-center justify-center rounded-full font-bold">1</span>
+<h3 class="text-2xl font-bold font-headline text-primary">コードを確認する</h3>
+</div>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                                編集画面の右上にあるツールバーから「&lt;/&gt; View Code」ボタンを探してください。ここから生成されたHTMLソースコードにアクセスできます。
+                            </p>
+<div class="bg-surface-container-low p-6 rounded-xl border border-outline-variant/10">
+<div class="flex items-center gap-3 bg-surface-container-lowest p-3 rounded shadow-sm border border-outline-variant/20 inline-flex">
+<span class="material-symbols-outlined text-primary">code</span>
+<span class="font-bold text-primary text-sm">View Code</span>
+</div>
+<p class="mt-4 text-xs text-on-surface-variant italic">※ 編集が完了したら必ずこのボタンをクリックして最新のコードを生成してください。</p>
+</div>
+</div>
+<div class="w-full md:w-72 aspect-video bg-surface-container-high rounded-lg overflow-hidden relative group">
+<img class="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-700" data-alt="Modern code editor interface with highlighted buttons" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeI_CdUu6y6BdaO5gX3QkXe8xytDhP0J6_zXxcTalYISxN1E8uyOzAPNgAAH31C9NDvnLIf9BrvK4H6HufyekGSk_y7NOSzA1y7t5HV07Q0H6_P3EsIM1LQTJlBgrVPt3MtJyTaPRH637B4d0MLOgjvUZUrFeicGaJOIFe-MyWFpSyduUu83GlNTx-mOmFNklZjgfQTqT3JVkty0rYi7RyGjkpVrUjv6WGFPQa4rYeDci2RqlnDTZj9xtRT9wxry5bxNkAghdARXA"/>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-5xl text-primary animate-pulse">ads_click</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-outline-variant/30"></div>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-surface-container-highest text-primary w-8 h-8 flex items-center justify-center rounded-full font-bold">2</span>
+<h3 class="text-2xl font-bold font-headline text-primary">ソースをコピーする</h3>
+</div>
+<p class="text-on-surface-variant leading-relaxed">
+                                表示されたモーダルウィンドウ内のコードを全選択してコピーします。「Copy to Clipboard」ボタンを使用すると正確かつ迅速にコピーが可能です。
+                            </p>
+</div>
+<div class="w-full md:w-72 flex flex-col gap-4">
+<div class="bg-surface-container-lowest p-4 rounded shadow-lg flex items-center justify-between">
+<div class="flex gap-2">
+<div class="w-2 h-2 rounded-full bg-error/40"></div>
+<div class="w-2 h-2 rounded-full bg-on-tertiary-container/40"></div>
+<div class="w-2 h-2 rounded-full bg-primary/20"></div>
+</div>
+<button class="bg-primary/10 text-primary text-[10px] font-bold px-2 py-1 rounded">COPY</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Step 3 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-outline-variant/30"></div>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-surface-container-highest text-primary w-8 h-8 flex items-center justify-center rounded-full font-bold">3</span>
+<h3 class="text-2xl font-bold font-headline text-primary">ローカルに保存</h3>
+</div>
+<p class="text-on-surface-variant leading-relaxed">
+                                お使いのテキストエディタ（VS Code等）を開き、新規ファイルを作成して貼り付けます。ファイル名は必ず <code class="bg-surface-container px-2 rounded font-bold text-primary">index.html</code> として保存してください。
+                            </p>
+</div>
+<div class="w-full md:w-72 bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 text-center">
+<span class="material-symbols-outlined text-4xl text-primary mb-2">description</span>
+<div class="font-bold text-sm text-on-surface">index.html</div>
+</div>
+</div>
+</div>
+<!-- Step 4 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-outline-variant/30"></div>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-surface-container-highest text-primary w-8 h-8 flex items-center justify-center rounded-full font-bold">4</span>
+<h3 class="text-2xl font-bold font-headline text-primary">多言語フォルダ構成</h3>
+</div>
+<p class="text-on-surface-variant leading-relaxed">
+                                日本語版と英語版を両方公開する場合は、ディレクトリを分けます。ルートディレクトリに <code class="bg-surface-container px-2 rounded font-bold">/jp</code> と <code class="bg-surface-container px-2 rounded font-bold">/en</code> フォルダを作成し、それぞれの index.html を配置します。
+                            </p>
+</div>
+<div class="w-full md:w-72 font-label text-xs space-y-2 bg-surface-container-low p-4 rounded-lg">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm">folder_open</span> project_root</div>
+<div class="flex items-center gap-2 pl-4"><span class="material-symbols-outlined text-sm">folder</span> jp / <span class="text-on-surface-variant italic">index.html</span></div>
+<div class="flex items-center gap-2 pl-4"><span class="material-symbols-outlined text-sm">folder</span> en / <span class="text-on-surface-variant italic">index.html</span></div>
+</div>
+</div>
+</div>
+<!-- Step 5 -->
+<div class="relative pl-12">
+<div class="absolute left-0 top-0 bottom-0 w-[3px] bg-outline-variant/30"></div>
+<div class="flex flex-col md:flex-row gap-12 items-start">
+<div class="flex-1">
+<div class="flex items-center gap-4 mb-4">
+<span class="bg-surface-container-highest text-primary w-8 h-8 flex items-center justify-center rounded-full font-bold">5</span>
+<h3 class="text-2xl font-bold font-headline text-primary">サーバーへアップロード</h3>
+</div>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                                最後にファイルをGitHubリポジトリにプッシュします。VercelやAWS Amplifyと連携していれば、プッシュと同時に自動で世界中に公開されます。
+                            </p>
+<div class="flex gap-4">
+<div class="flex flex-col items-center p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 flex-1">
+<span class="material-symbols-outlined text-3xl mb-1">cloud_done</span>
+<span class="text-[10px] font-bold">GITHUB</span>
+</div>
+<span class="material-symbols-outlined self-center text-outline-variant">arrow_forward</span>
+<div class="flex flex-col items-center p-3 bg-surface-container-lowest rounded-lg border border-outline-variant/20 flex-1">
+<span class="material-symbols-outlined text-3xl mb-1">rocket_launch</span>
+<span class="text-[10px] font-bold">VERCEL / AWS</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Deployment Checklist: Bento Style -->
+<section class="max-w-5xl mx-auto mt-32">
+<h2 class="font-headline text-3xl text-primary font-bold mb-8">Deployment Checklist</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Check 1 -->
+<div class="bg-surface-container-lowest p-8 rounded-xl border border-outline-variant/10 shadow-sm col-span-1 md:col-span-2">
+<div class="flex items-start gap-4">
+<div class="bg-primary/5 p-3 rounded-full">
+<span class="material-symbols-outlined text-primary">fact_check</span>
+</div>
+<div>
+<h4 class="font-bold text-lg mb-2">最終プレビューの確認</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">
+                                    全てのリンクが正しく機能しているか、画像が表示されているか、モバイル表示に崩れがないかを確認しましたか？
+                                </p>
+</div>
+</div>
+</div>
+<!-- Check 2 -->
+<div class="bg-primary text-white p-8 rounded-xl flex flex-col justify-between">
+<h4 class="font-bold text-lg">メタデータの整合性</h4>
+<p class="text-sm opacity-80">TitleタグやDescriptionが各言語で適切に設定されているか確認してください。</p>
+<span class="material-symbols-outlined text-4xl opacity-20 self-end">language</span>
+</div>
+<!-- Check 3 -->
+<div class="bg-surface-container-low p-8 rounded-xl border border-outline-variant/10">
+<h4 class="font-bold text-lg mb-4">セキュリティ</h4>
+<ul class="space-y-3 text-sm text-on-surface-variant">
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span> HTTPS通信の有効化</li>
+<li class="flex items-center gap-2"><span class="material-symbols-outlined text-xs text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span> 不要なスクリプトの削除</li>
+</ul>
+</div>
+<!-- Check 4 -->
+<div class="bg-surface-container-highest p-8 rounded-xl flex items-center justify-between col-span-1 md:col-span-2">
+<div class="flex items-center gap-6">
+<div class="text-4xl font-headline font-bold text-primary">Ready?</div>
+<p class="text-sm text-on-surface-variant max-w-xs">全ての項目をチェックしたら、いよいよ公開です。司法の透明性を高める第一歩を。 </p>
+</div>
+<button class="bg-primary text-white px-8 py-3 rounded-md font-bold hover:scale-105 transition-transform">GO LIVE</button>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Footer -->
+<footer class="bg-[#f8f9fa] dark:bg-slate-900 w-full mt-auto flex flex-col items-center gap-6 px-8 py-12 border-t border-[#c6c5d4]/15">
+<div class="flex flex-wrap justify-center gap-8">
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#454652] dark:text-slate-500 hover:text-[#000666] dark:hover:text-blue-200 transition-opacity" href="#">Documentation</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#454652] dark:text-slate-500 hover:text-[#000666] dark:hover:text-blue-200 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#454652] dark:text-slate-500 hover:text-[#000666] dark:hover:text-blue-200 transition-opacity" href="#">Contact Admin</a>
+<a class="font-['Inter'] text-xs uppercase tracking-widest text-[#454652] dark:text-slate-500 hover:text-[#000666] dark:hover:text-blue-200 transition-opacity" href="#">API Status</a>
+</div>
+<p class="font-['Inter'] text-xs uppercase tracking-widest text-[#454652] text-center opacity-60">
+            © 2024 Open Justice Editorial. All Rights Reserved. Confidential Judicial Documentation.
+        </p>
+</footer>
+</body></html>

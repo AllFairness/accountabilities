@@ -25,6 +25,7 @@ export default async function LandingPage() {
           <div style={{ display: "flex", gap: 24, alignItems: "center" }}>
             <Link href="/map" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>データを見る</Link>
             <Link href="/professionals" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>一覧</Link>
+            <Link href="/editorial" style={{ fontSize: 13, color: "#555", textDecoration: "none" }}>設計書</Link>
             <a
               href="/trials/new"
               style={{ fontSize: 13, fontWeight: 600, background: "#0f172a", color: "#fff", padding: "8px 18px", borderRadius: 8, textDecoration: "none" }}

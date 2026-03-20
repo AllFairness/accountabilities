@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>実装ロードマップと公開資料 | Open Justice Editorial</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,400;0,600;0,700;1,400;1,600&amp;family=Public+Sans:wght@300;400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed": "#151839",
+                        "on-tertiary-container": "#e17c5a",
+                        "on-error": "#ffffff",
+                        "surface-variant": "#e1e3e4",
+                        "on-surface-variant": "#454652",
+                        "tertiary-container": "#5c1800",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "background": "#f8f9fa",
+                        "surface-dim": "#d9dadb",
+                        "surface": "#f8f9fa",
+                        "on-secondary": "#ffffff",
+                        "on-tertiary-fixed": "#390c00",
+                        "secondary-fixed": "#e0e0ff",
+                        "on-primary-fixed-variant": "#343d96",
+                        "primary-fixed": "#e0e0ff",
+                        "surface-container": "#edeeef",
+                        "secondary": "#585c80",
+                        "inverse-surface": "#2e3132",
+                        "primary-container": "#1a237e",
+                        "on-primary-fixed": "#000767",
+                        "on-surface": "#191c1d",
+                        "surface-tint": "#4c56af",
+                        "on-primary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "on-secondary-container": "#575b7f",
+                        "on-background": "#191c1d",
+                        "surface-container-low": "#f3f4f5",
+                        "tertiary-fixed": "#ffdbd0",
+                        "tertiary-fixed-dim": "#ffb59d",
+                        "outline": "#767683",
+                        "on-secondary-fixed-variant": "#414467",
+                        "surface-bright": "#f8f9fa",
+                        "tertiary": "#380b00",
+                        "primary-fixed-dim": "#bdc2ff",
+                        "secondary-fixed-dim": "#c1c3ed",
+                        "error-container": "#ffdad6",
+                        "outline-variant": "#c6c5d4",
+                        "primary": "#000666",
+                        "on-tertiary-fixed-variant": "#7b2e12",
+                        "inverse-on-surface": "#f0f1f2",
+                        "inverse-primary": "#bdc2ff",
+                        "on-primary-container": "#8690ee",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary-container": "#d2d4ff",
+                        "surface-container-high": "#e7e8e9",
+                        "on-tertiary": "#ffffff"
+                    },
+                    fontFamily: {
+                        "headline": ["Newsreader", "serif"],
+                        "body": ["Public Sans", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .primary-gradient {
+            background: linear-gradient(135deg, #000666 0%, #1a237e 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 sticky z-50 no-border bg-[#f3f4f5] transition-colors duration-300">
+<div class="max-w-7xl mx-auto px-8 py-4 flex justify-between items-center">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-[#000666]" data-icon="gavel">gavel</span>
+<h1 class="text-2xl font-serif italic tracking-tight text-[#000666]">Open Justice Editorial</h1>
+</div>
+<nav class="hidden md:flex items-center gap-8">
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Overview</a>
+<a class="text-[#000666] font-bold border-b-2 border-[#000666] pb-1 hover:text-[#1a237e] transition-all" href="#">Roadmap</a>
+<a class="text-[#454652] font-medium hover:text-[#1a237e] transition-all" href="#">Archive</a>
+</nav>
+<button class="primary-gradient text-on-primary px-5 py-2 rounded-lg text-sm font-label uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition-all scale-95 duration-200 ease-in-out">
+<span class="material-symbols-outlined text-sm" data-icon="description">description</span>
+                Read Document
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-8 py-20">
+<!-- Hero Section -->
+<section class="mb-32">
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-end">
+<div class="lg:col-span-8">
+<span class="font-label text-on-surface-variant uppercase tracking-[0.2em] text-xs mb-4 block">System Implementation Framework</span>
+<h2 class="font-headline italic text-6xl lg:text-7xl text-primary leading-tight tracking-tight mb-8">
+                        実装ロードマップと<br/>公開資料
+                    </h2>
+<p class="text-xl text-on-surface-variant max-w-2xl leading-relaxed">
+                        司法判断の品質スコアリングシステム（JDQSS）の構築に向けた、三段階のフェーズ展開。透明性の確保と技術的整合性を重視した開発プロセスを公開します。
+                    </p>
+</div>
+<div class="lg:col-span-4 flex justify-end">
+<div class="w-full h-40 bg-surface-container rounded-xl flex items-center justify-center relative overflow-hidden">
+<div class="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary to-transparent"></div>
+<span class="font-headline italic text-4xl text-primary/20">Phase 01-03</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Roadmap Timeline -->
+<section class="mb-32">
+<div class="flex items-center gap-4 mb-16">
+<h3 class="font-headline italic text-4xl text-primary">Implementation Roadmap</h3>
+<div class="h-px flex-grow bg-outline-variant opacity-20"></div>
+</div>
+<div class="space-y-12">
+<!-- Phase 1 -->
+<div class="group flex flex-col md:flex-row gap-8 items-start">
+<div class="w-full md:w-1/4 pt-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border border-primary flex items-center justify-center shrink-0">
+<span class="font-label font-bold text-primary">01</span>
+</div>
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant block">Q3 2024</span>
+<span class="font-bold text-primary">Foundation Phase</span>
+</div>
+</div>
+</div>
+<div class="flex-grow bg-surface-container-lowest p-8 rounded-xl shadow-[0_20px_40px_rgba(25,28,29,0.03)] border-l-[3px] border-primary transition-all group-hover:bg-white">
+<h4 class="font-headline text-2xl mb-4">基礎インフラとデータセット構築</h4>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            過去10年間の判例アーカイブを正規化し、機械学習モデルの訓練に適した構造化データへと変換します。法曹界の専門家によるアノテーション基準を策定し、バイアスの最小化を図ります。
+                        </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex items-center gap-3 bg-surface-container-low p-3 rounded">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="database">database</span>
+<span class="text-sm font-medium">判例データ正規化エンジン</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-low p-3 rounded">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="rule">rule</span>
+<span class="text-sm font-medium">アノテーション・ガイドライン策定</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Phase 2 -->
+<div class="group flex flex-col md:flex-row gap-8 items-start">
+<div class="w-full md:w-1/4 pt-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center shrink-0">
+<span class="font-label font-bold text-outline">02</span>
+</div>
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant block">Q1 2025</span>
+<span class="font-bold text-on-surface">Integration Phase</span>
+</div>
+</div>
+</div>
+<div class="flex-grow bg-surface-container p-8 rounded-xl border-l-[3px] border-outline-variant transition-all">
+<h4 class="font-headline text-2xl mb-4 text-on-surface-variant">品質スコアリング・アルゴリズムの開発</h4>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            論理的一貫性、引用の妥当性、法的根拠の明確さを多角的に分析する独自アルゴリズムを実装。透明性を確保するため、評価ロジックの一部をオープンソースとして公開します。
+                        </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex items-center gap-3 bg-surface-container-highest p-3 rounded opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="functions">functions</span>
+<span class="text-sm font-medium">多角的品質評価モデル</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-highest p-3 rounded opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="code">code</span>
+<span class="text-sm font-medium">ロジック透明化フレームワーク</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Phase 3 -->
+<div class="group flex flex-col md:flex-row gap-8 items-start">
+<div class="w-full md:w-1/4 pt-2">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full border border-outline-variant flex items-center justify-center shrink-0">
+<span class="font-label font-bold text-outline">03</span>
+</div>
+<div>
+<span class="font-label text-xs uppercase tracking-widest text-on-surface-variant block">Q3 2025</span>
+<span class="font-bold text-on-surface">Deployment Phase</span>
+</div>
+</div>
+</div>
+<div class="flex-grow bg-surface-container p-8 rounded-xl border-l-[3px] border-outline-variant transition-all">
+<h4 class="font-headline text-2xl mb-4 text-on-surface-variant">パブリックアクセスと継続的改善</h4>
+<p class="text-on-surface-variant leading-relaxed mb-6">
+                            法曹関係者および一般市民がアクセス可能なインターフェースをローンチ。フィードバックループを構築し、社会的要請と法的解釈の変化に適応するエコシステムを完成させます。
+                        </p>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="flex items-center gap-3 bg-surface-container-highest p-3 rounded opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="public">public</span>
+<span class="text-sm font-medium">市民公開用ダッシュボード</span>
+</div>
+<div class="flex items-center gap-3 bg-surface-container-highest p-3 rounded opacity-60">
+<span class="material-symbols-outlined text-on-surface-variant text-xl" data-icon="loop">loop</span>
+<span class="text-sm font-medium">動的改善メカニズム</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Download Records Section (Bento Style) -->
+<section class="mb-32">
+<div class="flex flex-col md:flex-row justify-between items-baseline gap-6 mb-12">
+<h3 class="font-headline italic text-4xl text-primary">Public Records</h3>
+<p class="font-label text-xs uppercase tracking-widest text-on-surface-variant">Technical Specifications &amp; Whitepapers</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Main Download Card -->
+<div class="md:col-span-2 bg-surface-container-lowest p-10 rounded-xl relative overflow-hidden group border border-outline-variant border-opacity-10">
+<div class="relative z-10 flex flex-col h-full">
+<span class="font-label text-[10px] uppercase tracking-[0.3em] text-primary mb-6">Master Design Document</span>
+<h4 class="font-headline text-3xl mb-4">司法判断品質スコアリング<br/>システム設計書 (v1.2)</h4>
+<p class="text-on-surface-variant mb-12 max-w-lg">
+                            システム全体のアーキテクチャ、データ倫理規定、および評価基準の詳細を網羅した包括的な設計ドキュメントです。
+                        </p>
+<div class="mt-auto flex items-center gap-6">
+<button class="primary-gradient text-on-primary px-8 py-3 rounded-lg font-label uppercase text-xs tracking-widest flex items-center gap-3 hover:shadow-xl transition-all">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+                                Download PDF
+                            </button>
+<span class="text-xs text-on-surface-variant/60 font-label">PDF / 14.8 MB</span>
+</div>
+</div>
+<!-- Abstract Background Pattern -->
+<div class="absolute top-0 right-0 w-64 h-64 -mr-20 -mt-20 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+<span class="material-symbols-outlined text-[15rem]" data-icon="gavel">gavel</span>
+</div>
+</div>
+<!-- Secondary Download Cards -->
+<div class="space-y-6">
+<div class="bg-surface-container p-8 rounded-xl flex flex-col justify-between hover:bg-surface-container-high transition-colors">
+<div>
+<span class="material-symbols-outlined text-primary mb-4" data-icon="description">description</span>
+<h5 class="font-bold text-sm mb-2">評価基準概要要旨</h5>
+<p class="text-xs text-on-surface-variant">評価指標の選定理由と論理構成に関する簡潔な要約。</p>
+</div>
+<a class="text-primary font-label text-[10px] uppercase tracking-widest mt-6 inline-flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                            View Abstract <span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="bg-surface-container p-8 rounded-xl flex flex-col justify-between hover:bg-surface-container-high transition-colors">
+<div>
+<span class="material-symbols-outlined text-primary mb-4" data-icon="history_edu">history_edu</span>
+<h5 class="font-bold text-sm mb-2">アノテーション・ログ</h5>
+<p class="text-xs text-on-surface-variant">初期フェーズにおけるデータセット作成プロセスの記録。</p>
+</div>
+<a class="text-primary font-label text-[10px] uppercase tracking-widest mt-6 inline-flex items-center gap-2 hover:gap-4 transition-all" href="#">
+                            View Logs <span class="material-symbols-outlined text-xs" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+</div>
+</section>
+<!-- Methodological Note -->
+<section class="max-w-3xl mx-auto text-center border-t border-outline-variant border-opacity-10 pt-20">
+<h4 class="font-headline italic text-2xl mb-6">透明性への誓約</h4>
+<p class="text-on-surface-variant italic leading-relaxed">
+                「開かれた司法」の実現には、技術的な洗練だけでなく、そのプロセス自体の可視化が不可欠です。本ロードマップは固定的なスケジュールではなく、社会的な対話を通じて常に更新される生きた指針です。
+            </p>
+</section>
+</main>
+<!-- Footer -->
+<footer class="full-width py-12 no-border bg-[#edeeef] transition-opacity opacity-80 hover:opacity-100">
+<div class="max-w-7xl mx-auto px-8 flex flex-col md:flex-row justify-between items-center">
+<p class="text-[#454652] font-sans text-sm mb-6 md:mb-0">© 2024 Open Justice Editorial. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="text-[#454652] font-sans text-sm hover:text-[#000666]" href="#">Contact</a>
+<a class="text-[#454652] font-sans text-sm hover:text-[#000666]" href="#">Methodology</a>
+<a class="text-[#454652] font-sans text-sm hover:text-[#000666]" href="#">Privacy Policy</a>
+</div>
+</div>
+</footer>
+</body></html>
