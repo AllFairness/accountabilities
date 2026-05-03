@@ -1,7 +1,7 @@
 import { MetadataRoute } from "next";
 import { query } from "@/lib/db";
 
-export const revalidate = 86400; // 24時間キャッシュ
+export const dynamic = "force-dynamic";
 
 interface ProfRow { id: number; }
 

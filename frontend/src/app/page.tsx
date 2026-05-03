@@ -4,7 +4,7 @@ import { PageTracker } from "./components/PageTracker";
 
 interface CountRow { count: string; }
 
-export const revalidate = 3600; // 1時間キャッシュ
+export const dynamic = "force-dynamic";
 
 export default async function LandingPage() {
   const [profRows, decRows] = await Promise.all([
