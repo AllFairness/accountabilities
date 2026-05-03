@@ -63,10 +63,10 @@ export async function GET(request: NextRequest) {
       // チャート描画用座標（全ユーザーに返す）
       x: r.stance_axis1,
       y: r.stance_axis2,
-      // 認証済みユーザーのみスコア数値を返す
-      transparency: isAuthenticated ? r.stance_axis1 : null,
-      accountability: isAuthenticated ? r.stance_axis2 : null,
-      confidence: isAuthenticated ? r.confidence : null,
+      // Public score values. Conduct logs and decision details stay gated in their own APIs.
+      transparency: r.stance_axis1,
+      accountability: r.stance_axis2,
+      confidence: r.confidence,
       cases: r.record_count,
       color: color(r.profession_type),
     }));

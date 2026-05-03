@@ -31,6 +31,10 @@ function profColor(t: string) {
   return "#6b7280";
 }
 
+function clampPct(value: number) {
+  return Math.max(0, Math.min(100, value));
+}
+
 // ---- generateMetadata（SEO用） ----
 export async function generateMetadata(
   { params }: { params: { id: string } }
@@ -143,26 +147,23 @@ export default async function ProfessionalDetailPage(
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">関連案件数</div>
               </div>
-              {isAuthenticated ? (
-                /* ログイン済み：スコアは集計中メッセージ */
-                <div className="col-span-3">
-                  <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
-                    <p className="text-sm text-amber-700">
-                      ⚠️ スコアは現在集計中です。正式公開までお待ちください。
-                    </p>
+              <div className="col-span-3 grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { label: "透明性スコア", value: p.stance_axis1, color: "bg-[#185FA5]", pct: ((p.stance_axis1 + 1) / 2) * 100 },
+                  { label: "説明責任スコア", value: p.stance_axis2, color: "bg-emerald-500", pct: ((p.stance_axis2 + 1) / 2) * 100 },
+                  { label: "信頼度", value: p.confidence, color: "bg-purple-500", pct: p.confidence * 100 },
+                ].map((s) => (
+                  <div key={s.label} className="bg-gray-50 border border-gray-100 rounded-lg p-3">
+                    <div className="text-xs text-gray-500 mb-1">{s.label}</div>
+                    <div className="text-lg font-bold text-gray-900 mb-2">
+                      {s.label === "信頼度" ? `${s.pct.toFixed(0)}%` : s.value.toFixed(2)}
+                    </div>
+                    <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                      <div className={`h-full rounded-full ${s.color}`} style={{ width: `${clampPct(s.pct)}%` }} />
+                    </div>
                   </div>
-                </div>
-              ) : (
-                /* ゲスト：ログイン促進 */
-                <div className="col-span-3">
-                  <div className="rounded-lg border border-indigo-100 bg-indigo-50 p-4 flex items-center justify-between gap-3">
-                    <p className="text-sm text-indigo-700">
-                      ログインするとスコア詳細が表示されます
-                    </p>
-                    <GoogleLoginButton small />
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
         </div>

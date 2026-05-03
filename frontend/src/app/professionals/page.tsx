@@ -9,6 +9,9 @@ type Professional = {
   organization: string;
   color: string;
   cases: number;
+  transparency: number;
+  accountability: number;
+  confidence: number;
 };
 
 const professions = [
@@ -17,6 +20,10 @@ const professions = [
   { name: "医師", color: "#f59e0b" },
   { name: "公務員", color: "#ef4444" },
 ];
+
+function clampPct(value: number) {
+  return Math.max(0, Math.min(100, value));
+}
 
 export default function ProfessionalsPage() {
   const [data, setData] = useState<Professional[]>([]);
@@ -109,9 +116,36 @@ export default function ProfessionalsPage() {
                     {p.profession}
                   </span>
                 </div>
-                {p.cases > 0 && (
-                  <div className="mt-2 text-xs text-gray-400">{p.cases.toLocaleString()} 件</div>
-                )}
+                <div className="mt-3 border-t border-gray-50 pt-3 space-y-2">
+                  <div className="flex items-center justify-between text-xs mb-1">
+                    <span className="text-gray-500">関連案件: {p.cases.toLocaleString()} 件</span>
+                  </div>
+                  {p.transparency !== undefined && (
+                    <>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="w-14 text-gray-500">透明性</span>
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-[#185FA5] rounded-full" style={{ width: `${clampPct(((p.transparency + 1) / 2) * 100)}%` }} />
+                        </div>
+                        <span className="w-8 text-right font-medium text-gray-700">{p.transparency.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="w-14 text-gray-500">説明責任</span>
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${clampPct(((p.accountability + 1) / 2) * 100)}%` }} />
+                        </div>
+                        <span className="w-8 text-right font-medium text-gray-700">{p.accountability.toFixed(2)}</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="w-14 font-semibold text-gray-600">信頼度</span>
+                        <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-full bg-purple-500 rounded-full" style={{ width: `${clampPct(p.confidence * 100)}%` }} />
+                        </div>
+                        <span className="w-8 text-right font-bold text-gray-800">{(p.confidence * 100).toFixed(0)}%</span>
+                      </div>
+                    </>
+                  )}
+                </div>
               </Link>
             ))}
           </div>

@@ -50,9 +50,9 @@ export async function GET(
       cases: r.record_count,
       x: r.stance_axis1,
       y: r.stance_axis2,
-      transparency: isAuthenticated ? r.stance_axis1 : null,
-      accountability: isAuthenticated ? r.stance_axis2 : null,
-      confidence: isAuthenticated ? r.confidence : null,
+      transparency: r.stance_axis1,
+      accountability: r.stance_axis2,
+      confidence: r.confidence,
     };
     return NextResponse.json({ data, authenticated: isAuthenticated }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (e) {

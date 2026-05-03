@@ -47,6 +47,10 @@ function LoginPrompt() {
   );
 }
 
+function clampPct(value: number) {
+  return Math.max(0, Math.min(100, value));
+}
+
 export default function MapPage() {
   const svgRef = useRef<SVGSVGElement>(null);
   const { data: session, status } = useSession();
@@ -297,12 +301,6 @@ export default function MapPage() {
               ))}
               <div className="flex items-center gap-1.5"><span className="text-gray-400">○サイズ</span>= 案件数</div>
             </div>
-            <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800 leading-relaxed">
-              <span className="font-semibold">⚠️ 現在のスコアについて</span>
-              <span className="ml-1">
-                透明性・説明責任スコアは現在集計中です。表示されているスコアおよび散布図上の位置は仮のものであり、実際の評価を反映していません。正式なスコアの公開までしばらくお待ちください。
-              </span>
-            </div>
           </div>
 
           <div className="lg:w-72">
@@ -317,19 +315,18 @@ export default function MapPage() {
                 <h2 className="text-xl font-bold text-[#0f172a] mb-1">{selected.name}</h2>
                 {selected.organization && <p className="text-xs text-gray-500 mb-4">{selected.organization}</p>}
 
-                {isAuthenticated ? (
                   <dl className="space-y-3">
                     {[
                       { label: "透明性スコア", value: selected.transparency, color: "bg-[#185FA5]", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
                       { label: "説明責任スコア", value: selected.accountability, color: "bg-emerald-500", fmt: (v: number) => v.toFixed(2), pct: (v: number) => ((v + 1) / 2) * 100 },
                       { label: "信頼度", value: selected.confidence, color: "bg-purple-500", fmt: (v: number) => `${(v * 100).toFixed(0)}%`, pct: (v: number) => v * 100 },
                     ].map(({ label, value, color, fmt, pct }) => (
-                      value !== null && (
+                      value !== null && value !== undefined && (
                         <div key={label}>
                           <dt className="text-xs text-gray-500 mb-1">{label}</dt>
                           <div className="flex items-center gap-2">
                             <div className="flex-1 h-2 bg-gray-100 rounded-full">
-                              <div className={`h-2 rounded-full ${color}`} style={{ width: `${pct(value)}%` }} />
+                              <div className={`h-2 rounded-full ${color}`} style={{ width: `${clampPct(pct(value))}%` }} />
                             </div>
                             <span className="text-sm font-semibold text-gray-700 w-12 text-right">{fmt(value)}</span>
                           </div>
@@ -344,18 +341,6 @@ export default function MapPage() {
                       </dd>
                     </div>
                   </dl>
-                ) : (
-                  <div>
-                    <div className="pt-2 border-t border-gray-100 mb-3">
-                      <dt className="text-xs text-gray-500">関連案件数</dt>
-                      <dd className="text-2xl font-bold text-[#0f172a] mt-0.5">
-                        {selected.cases.toLocaleString()}
-                        <span className="text-sm font-normal text-gray-500 ml-1">件</span>
-                      </dd>
-                    </div>
-                    <LoginPrompt />
-                  </div>
-                )}
 
                 <ProfessionalDetails professionalId={selected.id} isAuthenticated={isAuthenticated} />
               </div>
@@ -383,10 +368,7 @@ export default function MapPage() {
                       <div key={p.name} className="text-xs">
                         <div className="flex items-center justify-between">
                           <span className="font-medium" style={{ color: p.color }}>{p.name} ({items.length})</span>
-                          {isAuthenticated
-                            ? <span className="text-gray-400">T:{avgX.toFixed(2)} A:{avgY.toFixed(2)}</span>
-                            : <span className="text-gray-400 text-xs">ログイン後表示</span>
-                          }
+                          <span className="text-gray-500 text-xs text-right">T: {avgX.toFixed(2)} / A: {avgY.toFixed(2)}</span>
                         </div>
                       </div>
                     );
